@@ -1,15 +1,21 @@
 <template>
     <button @click="handleLogin">Login</button>
+    <button @click="handleLogout">Logout</button>
 </template>
 
 <script setup lang="ts">
+import { useUserStore } from '@/stores/userStore';
 
-import { useAuthStore } from '@/stores/authStore'
 
-const authStore = useAuthStore();
+
+const userStore = useUserStore();
 
 function handleLogin() {
-    authStore.login();
+    userStore.login();
 } 
+
+function handleLogout() {
+    userStore.logout();
+}   
 
 </script>

@@ -7,9 +7,11 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
-export type { queryfilters_QueryParameter } from './models/queryfilters_QueryParameter';
-export type { user_CreateUserRequest } from './models/user_CreateUserRequest';
-export type { user_UpdateUserRequest } from './models/user_UpdateUserRequest';
+export type { queryFilter_QueryParameter } from './models/queryFilter_QueryParameter';
+export type { requests_CreateUserRequest } from './models/requests_CreateUserRequest';
+export type { requests_UpdateUserRequest } from './models/requests_UpdateUserRequest';
+export type { responses_UserPrivateProfileResponse } from './models/responses_UserPrivateProfileResponse';
+export type { responses_UserPublicProfileResponse } from './models/responses_UserPublicProfileResponse';
 export type { user_UserDTO } from './models/user_UserDTO';
 
 export { AuthenticationService } from './services/AuthenticationService';

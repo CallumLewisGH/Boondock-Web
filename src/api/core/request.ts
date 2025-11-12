@@ -278,7 +278,7 @@ export const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): 
         })();
 
         throw new ApiError(options, result,
-            `Boondock Error: status: ${errorStatus}; status text: ${errorStatusText}; body: ${errorBody}`
+            `Generic Error: status: ${errorStatus}; status text: ${errorStatusText}; body: ${errorBody}`
         );
     }
 };

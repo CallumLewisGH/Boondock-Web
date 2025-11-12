@@ -2,7 +2,8 @@
     <header>
       <div>
         <nav>
-          <p>THIS IS THE HOME PAGE WHEN YOU DONE LOGGING IN AND THAT PALLLLL</p>
+          <router-link to="/">Landing Page</router-link>
+          <router-link to="/login">Login</router-link>
         </nav>
       </div>
     </header>

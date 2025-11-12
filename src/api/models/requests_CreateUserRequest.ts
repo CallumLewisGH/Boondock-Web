@@ -2,8 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type queryfilters_QueryParameter = {
-    name?: string;
-    value?: Array<string>;
+export type requests_CreateUserRequest = {
+    authId: string;
+    email: string;
+    username: string;
 };
 

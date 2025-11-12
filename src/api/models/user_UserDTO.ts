@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type user_UserDTO = {
-    authId?: string;
     bio?: string;
     createdAt?: string;
     deactivatedAt?: string;

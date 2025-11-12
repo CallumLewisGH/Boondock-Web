@@ -2,78 +2,72 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { user_UserDTO } from '../models/user_UserDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class AuthenticationService {
     /**
-     * Google OAuth2 callback
-     * Handles the callback from Google OAuth2, creates user if new, and sets JWT cookie
-     * @param state OAuth state token
-     * @param code OAuth authorization code
+     * Logout current user from OAuth provider
+     * Clears the JWT cookie and performs OAuth provider logout
+     * @param provider OAuth provider (e.g., google, github)
      * @returns void
      * @throws ApiError
      */
-    public static postAuthenticationCallback(
-        state: string,
-        code: string,
+    public static getAuthenticationLogout(
+        provider: string,
     ): CancelablePromise<void> {
         return __request(OpenAPI, {
-            method: 'POST',
-            url: '/authentication/callback',
-            query: {
-                'state': state,
-                'code': code,
+            method: 'GET',
+            url: '/authentication/logout/{provider}',
+            path: {
+                'provider': provider,
+            },
+            errors: {
+                302: `Redirects to home page`,
+            },
+        });
+    }
+    /**
+     * Initiate OAuth2 login
+     * Redirects to OAuth2 consent page for the specified provider
+     * @param provider OAuth provider (e.g., google, github)
+     * @returns void
+     * @throws ApiError
+     */
+    public static getAuthentication(
+        provider: string,
+    ): CancelablePromise<void> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/authentication/{provider}',
+            path: {
+                'provider': provider,
+            },
+            errors: {
+                302: `Redirects to OAuth provider`,
+                500: `Returns error if authentication fails`,
+            },
+        });
+    }
+    /**
+     * OAuth2 callback
+     * Handles the callback from OAuth2 provider and sets JWT cookie
+     * @param provider OAuth provider (e.g., google, github)
+     * @returns void
+     * @throws ApiError
+     */
+    public static getAuthenticationCallback(
+        provider: string,
+    ): CancelablePromise<void> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/authentication/{provider}/callback',
+            path: {
+                'provider': provider,
             },
             errors: {
                 302: `Redirects to /home on success`,
-                400: `Invalid state token`,
-                409: `Returns error if username derived from email is already in use`,
-                500: `Returns error if token exchange, user info fetch, or JWT generation fails`,
-            },
-        });
-    }
-    /**
-     * Initiate Google OAuth2 login
-     * Redirects to Google's OAuth2 consent page
-     * @returns void
-     * @throws ApiError
-     */
-    public static getAuthenticationLogin(): CancelablePromise<void> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/authentication/login',
-            errors: {
-                302: `Redirects to Google OAuth`,
-                500: `Returns error if session state cannot be generated`,
-            },
-        });
-    }
-    /**
-     * Logout current user
-     * Clears the JWT cookie, effectively logging out the user
-     * @returns any Returns success message
-     * @throws ApiError
-     */
-    public static postAuthenticationLogout(): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/authentication/logout',
-        });
-    }
-    /**
-     * Get authenticated user info
-     * Returns information about the currently authenticated user
-     * @returns user_UserDTO Returns user object
-     * @throws ApiError
-     */
-    public static getAuthenticationUser(): CancelablePromise<user_UserDTO> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/authentication/user',
-            errors: {
-                404: `User not found`,
+                500: `Returns error if user authentication fails`,
             },
         });
     }
