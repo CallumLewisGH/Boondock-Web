@@ -4,8 +4,12 @@
 
 <script setup lang="ts">
 
+import { useAuthStore } from '@/stores/authStore'
+
+const authStore = useAuthStore();
+
 function handleLogin() {
-    alert('Login button clicked');
+    authStore.login();
 } 
 
 </script>
