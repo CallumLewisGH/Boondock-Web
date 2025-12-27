@@ -127,6 +127,5 @@ onMounted(() => {
 // In a real app, you would integrate Google OAuth here
 const signInWithGoogle = () => {
   userStore.login();
-  router.push('/home');
 };
 </script>

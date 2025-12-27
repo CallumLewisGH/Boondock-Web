@@ -29,9 +29,11 @@ export const useUserStore = defineStore('userStore', () => {
     try {
       user.value = await AuthenticationService.getCurrentUser()
       error.value = null
+      return true
     } catch (err: any) {
       error.value = err.message
       user.value = null
+      return false
     } finally {
       loading.value = false
     }
