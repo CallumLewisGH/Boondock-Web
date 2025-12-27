@@ -2,19 +2,20 @@
 
 :root {
   /* Base colors - 8 total for light mode */
-  --bg-color: #f5f5f4;
-  --text-color: #0f172a;
-  --surface: #ffffff;
-  --card-bg: #fafaf9;
-  --border: #e7e5e4;
+  --bg-color: #fafaf9;               /* Warm off-white background */
+  --text-color: #1c1917;              /* Warm near-black */
+  --surface: #f5f5f4;
+
+  --card-bg: #e7e5e4;                
+  --border: #d6d3d1;                  /* Stone 200 */
   --accent: #ea580c;
   --accent-light: #fdba74;
-  --muted: #78716c;
+  --muted: #78716c;                   /* Stone 500 */
   
-  /* Header specific - NOT blue anymore */
-  --header-bg: #1c1917;
-  --header-text: #ffffff;
-  --header-muted: #d6d3d1;
+  /* Header specific */
+  --header-bg: #1c1917;               /* Stone 900 */
+  --header-text: #fafaf9;              /* Matches background */
+  --header-muted: #d6d3d1;            /* Stone 300 */
   
   /* Derived */
   --badge-bg: rgba(234, 88, 12, 0.3);
@@ -25,18 +26,18 @@
 
 .dark {
   /* 8 colors for dark mode - matching structure */
-  --bg-color: #1c1917;
-  --text-color: #f8fafc;
-  --surface: #1c1917;
-  --card-bg: #292524;
-  --border: #44403c;
+  --bg-color: #1c1917;                /* Stone 900 */
+  --text-color: #fafaf9;               /* Stone 50 */
+  --surface: #292524;                 /* Stone 800 */
+  --card-bg: #44403c;                 /* Stone 700 */
+  --border: #57534e;                  /* Stone 600 */
   --accent: #ea580c;
   --accent-light: #c2410c;
-  --muted: #a8a29e;
+  --muted: #a8a29e;                   /* Stone 400 */
   
-  /* Header specific - stays the same in dark mode */
-  --header-bg: #0c0a09;
-  --header-text: #ffffff;
+  /* Header specific */
+  --header-bg: #0c0a09;               /* Stone 950 - slightly darker */
+  --header-text: #fafaf9;
   --header-muted: #d6d3d1;
   
   /* Derived */
