@@ -1,116 +1,8 @@
-<script setup lang="ts">
-import router from '@/router';
-import { ref, onMounted } from 'vue';
-
-const isMenuOpen = ref(false);
-const isDark = ref(localStorage.getItem('darkMode') !== 'false');
-
-const updateDOM = () => {
-  if (isDark.value) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
-  localStorage.setItem('darkMode', isDark.value.toString());
-};
-
-const toggleDarkMode = () => {
-  isDark.value = !isDark.value;
-  updateDOM();
-};
-
-onMounted(() => {
-  if (!localStorage.getItem('darkMode')) {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    isDark.value = prefersDark;
-  }
-  updateDOM();
-});
-
-const handleAuth = () => {
-  router.push('/login');
-};
-
-const features = [
-  {
-    title: 'Hidden Gems',
-    desc: 'Discover secluded wild camping spots verified by the community.',
-    icon: '📍'
-  },
-  {
-    title: 'Offline Maps',
-    desc: 'Download topographical maps for when the signal fades.',
-    icon: '🗺️'
-  },
-  {
-    title: 'Leave No Trace',
-    desc: 'Guides on sustainable camping to keep the wild, wild.',
-    icon: '🌿'
-  }
-];
-</script>
-
 <template>
- <div class="min-h-screen transition-colors duration-300 font-sans" 
-       :style="{ backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }">
-    
-    <nav class="absolute w-full z-20 top-0 left-0 border-b backdrop-blur-md"
-         :style="{ 
-           borderColor: 'var(--border)',
-           backgroundColor: isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.1)'
-         }">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
-          <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer">
-            <span class="font-bold text-2xl tracking-wider uppercase text-white">Boondock</span>
-          </div>
-
-          <div class="hidden md:flex items-center space-x-8">
-            <!-- Changed: Always white text for nav links -->
-            <a href="#" class="text-white hover:text-orange-200 transition-colors">About</a>
-            <a href="#" class="text-white hover:text-orange-200 transition-colors">Guidelines</a>
-
-            <button 
-              @click="toggleDarkMode" 
-              class="p-2 rounded-full transition text-white hover:text-orange-200"
-              :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
-            >
-              {{ isDark ? '☀️' : '🌙' }}
-            </button>
-
-            <button 
-              @click="handleAuth"
-              class="px-6 py-2 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg text-white"
-              :style="{ backgroundColor: 'var(--accent)' }"
-            >
-              Sign In / Join
-            </button>
-          </div>
-
-          <div class="md:hidden flex items-center gap-4">
-            <button 
-              @click="toggleDarkMode" 
-              class="p-2 text-white"
-              :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
-            >
-              {{ isDark ? '☀️' : '🌙' }}
-            </button>
-            <button @click="isMenuOpen = !isMenuOpen" class="focus:outline-none">
-              <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" 
-                   :style="{ color: 'var(--accent)' }">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </nav>
-
+  <LandingLayout>
+    <!-- Hero Section with all original effects -->
     <header class="relative h-[80vh] flex items-center justify-center overflow-hidden"
-        :style="{ 
-          background: isDark ? 'var(--header-bg)' : 'var(--header-bg)',
-          color: 'var(--header-text)'
-        }">
+            :style="{ backgroundColor: 'var(--header-bg)' }">
       <div class="absolute inset-0 pointer-events-none">
         <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full blur-[120px]"
              :style="{ backgroundColor: 'var(--glow-orange)' }"></div>
@@ -125,7 +17,7 @@ const features = [
                 borderColor: 'var(--badge-border)',
                 color: 'var(--accent)'
               }">
-          Beta Access
+          Beta Access Live
         </span>
         <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight"
             :style="{ color: 'var(--header-text)' }">
@@ -141,17 +33,11 @@ const features = [
                   :style="{ backgroundColor: 'var(--accent)' }">
             Download App (WIP)
           </button>
-          <button class="border-2 px-8 py-4 rounded-lg text-lg font-bold hover:scale-105 transition"
-                  :style="{ 
-                    borderColor: 'var(--muted)',
-                    color: 'var(--header-muted)'
-                  }">
-            View Map
-          </button>
         </div>
       </div>
     </header>
 
+    <!-- Features Section with all original styling -->
     <section class="py-20 px-4 sm:px-6 lg:px-8"
              :style="{ backgroundColor: 'var(--surface)' }">
       <div class="max-w-7xl mx-auto">
@@ -192,18 +78,30 @@ const features = [
         </div>
       </div>
     </section>
-
-    <footer class="py-12 border-t"
-            :style="{ 
-              backgroundColor: 'var(--bg-color)',
-              borderColor: 'var(--border)'
-            }">
-      <div class="max-w-7xl mx-auto px-4 text-center">
-        <p class="text-sm"
-           :style="{ color: 'var(--muted)' }">
-          © 2024 Boondock. The mountain awaits.
-        </p>
-      </div>
-    </footer>
-  </div>
+  </LandingLayout>
 </template>
+
+<script setup lang="ts">
+import LandingLayout from '@/layouts/LandingLayout.vue'
+import { useDarkMode } from '@/composables/useDarkMode'
+
+const { isDark } = useDarkMode()
+
+const features = [
+  {
+    title: 'Hidden Gems',
+    desc: 'Discover secluded wild camping spots verified by the community.',
+    icon: '📍'
+  },
+  {
+    title: 'Offline Maps',
+    desc: 'Download topographical maps for when the signal fades.',
+    icon: '🗺️'
+  },
+  {
+    title: 'Leave No Trace',
+    desc: 'Guides on sustainable camping to keep the wild, wild.',
+    icon: '🌿'
+  }
+]
+</script>

@@ -54,11 +54,11 @@
         <!-- Headline -->
         <h1 class="text-2xl font-bold mb-2"
             :style="{ color: 'var(--text-color)' }">
-          Welcome to the Wild
+          The Mountain <span :style="{ color: 'var(--accent)' }">Awaits</span>
         </h1>
         <p class="text-sm mb-8"
            :style="{ color: 'var(--muted)' }">
-          Sign in to access thousands of wild camping spots
+          Sign in to access our community curated wild camping spots
         </p>
 
         <!-- Google Sign In Button -->
