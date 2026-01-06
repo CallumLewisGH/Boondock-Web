@@ -121,7 +121,7 @@
                       Email Me
                     </h3>
                     <p :style="{ color: 'var(--muted)' }">
-                      callumlewis@boondock.co.uk
+                      callumlewis@boondock.uk
                     </p>
                   </div>
                 </div>
