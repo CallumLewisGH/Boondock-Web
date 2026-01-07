@@ -21,7 +21,7 @@
         </span>
         <h1 class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight"
             :style="{ color: 'var(--header-text)' }">
-          Leave <span :style="{ color: 'var(--accent)' }">No</span> Trace.<br>
+          Leave <span :style="{ color: 'var(--accent)' }">No</span> Trace<br>
         </h1>
         <p class="text-lg md:text-xl mb-10 max-w-2xl mx-auto"
            :style="{ color: 'var(--header-muted)' }">
@@ -140,8 +140,8 @@ const principles = [
     icon: '📋'
   },
   {
-    title: 'Travel on Durable Surfaces',
-    desc: 'Stick to established trails and campsites. Walk single file in the middle of the trail, even when wet or muddy.',
+    title: 'Travel on Trail',
+    desc: 'Stick to established trails and campsites. But don\'t let that stop you from exploring new areas responsibly!',
     icon: '👣'
   },
   {

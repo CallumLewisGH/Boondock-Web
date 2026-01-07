@@ -21,7 +21,7 @@
         </span>
         <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight"
             :style="{ color: 'var(--header-text)' }">
-          The Mountain <span :style="{ color: 'var(--accent)' }">Awaits</span>.
+          The Mountain <span :style="{ color: 'var(--accent)' }">Awaits</span>
         </h1>
         <p class="text-lg md:text-xl mb-10 max-w-2xl mx-auto"
            :style="{ color: 'var(--header-muted)' }">
