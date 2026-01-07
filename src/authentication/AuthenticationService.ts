@@ -34,4 +34,19 @@ export class AuthenticationService {
         const targetProvider = provider || this._provider;
         window.location.href = `${config.apiBaseUrl}/authentication/logout/${targetProvider}`;
     }
+
+    /**
+     * Check if user is authenticated
+     */
+    public static async getCurrentUser(): Promise<any> {
+        const response = await fetch(`${config.apiBaseUrl}/users/me`, {
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Not authenticated');
+        }
+        
+        return response.json();
+    }
 }

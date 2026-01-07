@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { AuthenticationService } from '@/authentication/AuthenticationService'
-import { UsersService, type user_UserDTO } from '@/api'
+import type { user_UserDTO } from '@/api'
 
 export const useUserStore = defineStore('userStore', () => {
   const user = ref<user_UserDTO | null>(null)
@@ -24,20 +24,10 @@ export const useUserStore = defineStore('userStore', () => {
     user.value = null
   }
 
-  async function getCurrentUser() {
-    const res = await UsersService.getUsersMe()
-
-    if (!res.id) {
-      throw new Error('No authenticated user found')
-    }
-
-    return res
-  }
-
   async function checkAuth() {
     loading.value = true
     try {
-      user.value = await getCurrentUser();
+      user.value = await AuthenticationService.getCurrentUser()
       error.value = null
       return true
     } catch (err: any) {
