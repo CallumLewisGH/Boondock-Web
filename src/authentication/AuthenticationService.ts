@@ -1,52 +1,64 @@
 // api/AuthenticationService.ts
-
 import { config } from "@/helpers/config";
+import { OpenAPI, UsersService } from "@/api";
 
 export class AuthenticationService {
     private static _provider: string = 'google'; 
 
-    /**
-     * Set the default provider for all auth operations
-     */
     public static setProvider(provider: string): void {
         this._provider = provider;
     }
 
-    /**
-     * Get the current default provider
-     */
-    public static getProvider(): string {
-        return this._provider;
+    public static initializeGlobalAuth(): void {
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+            (OpenAPI as any).HEADERS = {
+                ...OpenAPI.HEADERS,
+                Authorization: `Bearer ${token}`,
+            };
+        }
     }
 
     /**
-     * Login with the current provider (or default to google)
+     * Extracts token from URL, saves it, and visually cleans the browser URL bar.
      */
+    public static handleCallback(): boolean {
+        const url = new URL(window.location.href);
+        const token = url.searchParams.get('token');
+
+        if (token) {
+            localStorage.setItem('jwt_token', token);
+            
+            // Apply it to OpenAPI headers immediately
+            this.initializeGlobalAuth();
+
+            // Clean the params from the URL object
+            url.searchParams.delete('token');
+            url.searchParams.delete('redirect');
+            
+            // Update the browser URL immediately (Visual only, Router handles state)
+            window.history.replaceState({}, document.title, url.toString());
+            
+            return true;
+        }
+        return false;
+    }
+
     public static login(provider?: string): void {
         const targetProvider = provider || this._provider;
         window.location.href = `${config.apiBaseUrl}/authentication/${targetProvider}`;
     }
 
-    /**
-     * Logout from the current provider  
-     */
-    public static logout(provider?: string): void {
-        const targetProvider = provider || this._provider;
-        window.location.href = `${config.apiBaseUrl}/authentication/logout/${targetProvider}`;
+    public static logout(): void {
+        localStorage.removeItem('jwt_token');
+        (OpenAPI as any).HEADERS = {
+            ...OpenAPI.HEADERS,
+            Authorization: '',
+        };
+        window.location.href = `${config.apiBaseUrl}/authentication/logout/${this._provider}`;
     }
 
-    /**
-     * Check if user is authenticated
-     */
     public static async getCurrentUser(): Promise<any> {
-        const response = await fetch(`${config.apiBaseUrl}/users/me`, {
-            credentials: 'include'
-        });
-        
-        if (!response.ok) {
-            throw new Error('Not authenticated');
-        }
-        
-        return response.json();
+        return await UsersService.getUsersMe();
     }
 }

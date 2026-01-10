@@ -1,7 +1,7 @@
-// stores/authStore.ts (combined version)
-import { ref, computed } from 'vue'
+// stores/userStore.ts
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { AuthenticationService } from '@/authentication/AuthenticationService'
+import { AuthenticationService } from '@/authentication/AuthenticationService' // Ensure path matches your structure
 import type { user_UserDTO } from '@/api'
 
 export const useUserStore = defineStore('userStore', () => {
@@ -9,34 +9,43 @@ export const useUserStore = defineStore('userStore', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  async function setProvider(provider: string) {
-    AuthenticationService.setProvider(provider)
+  async function checkAuth() {
+    loading.value = true;
+    
+    // Check for token in URL and save it if found
+    AuthenticationService.handleCallback();
+    
+    // Ensure headers are set
+    AuthenticationService.initializeGlobalAuth();
+
+    try {
+      // Only fetch user if we actually have a token to use
+      if (localStorage.getItem('jwt_token')) {
+        user.value = await AuthenticationService.getCurrentUser();
+      }
+      error.value = null;
+      return true;
+    } catch (err: any) {
+      // If the fetch fails (invalid token), log out clean
+      if (localStorage.getItem('jwt_token')) {
+          console.error("Token verification failed", err);
+          AuthenticationService.logout(); 
+      }
+      user.value = null;
+      return false;
+    } finally {
+      loading.value = false;
+    }
   }
 
   async function login(provider?: string) {
-    error.value = null
+    if (provider) AuthenticationService.setProvider(provider)
     AuthenticationService.login()
   }
 
-  async function logout(provider?: string) {
-    error.value = null
+  async function logout() {
     AuthenticationService.logout()
     user.value = null
-  }
-
-  async function checkAuth() {
-    loading.value = true
-    try {
-      user.value = await AuthenticationService.getCurrentUser()
-      error.value = null
-      return true
-    } catch (err: any) {
-      error.value = err.message
-      user.value = null
-      return false
-    } finally {
-      loading.value = false
-    }
   }
 
   return {
@@ -45,7 +54,6 @@ export const useUserStore = defineStore('userStore', () => {
     error,
     login,
     logout,
-    checkAuth,
-    setProvider
+    checkAuth
   }
 })
