@@ -13,7 +13,7 @@
       <button 
         @click="toggleLayer"
         class="p-3 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition"
-        :title="showSatellite ? 'Switch to street view' : 'Switch to satellite view'"
+        :title="showSatellite ? 'Switch to topographical' : 'Switch to satellite'"
       >
         <span class="text-xl">{{ showSatellite ? '🌲' : '🛰️' }}</span>
       </button>
