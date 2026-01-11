@@ -17,14 +17,6 @@
       >
         <span class="text-xl">{{ showSatellite ? '🗺️' : '🛰️' }}</span>
       </button>
-      
-      <button 
-        @click="$emit('search')"
-        class="p-3 bg-white rounded-lg hover:bg-gray-50 transition shadow-lg"
-        title="Search campsites"
-      >
-        <span class="text-xl">🔍</span>
-      </button>
     </div>
   </div>
 </template>
@@ -147,9 +139,11 @@ const toggleLayer = () => {
   showSatellite.value = !showSatellite.value
   
   if (showSatellite.value) {
-    map.value.setStyle('mapbox://styles/mapbox/satellite-streets-v11')
+    // Satellite Streets is great for campers to see actual tree cover
+    map.value.setStyle('mapbox://styles/mapbox/satellite-streets-v12')
   } else {
-    map.value.setStyle('mapbox://styles/mapbox/streets-v11')
+    // Outdoors is the gold standard for your base map
+    map.value.setStyle('mapbox://styles/mapbox/outdoors-v12')
   }
 }
 
