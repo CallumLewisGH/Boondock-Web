@@ -15,7 +15,7 @@
         class="p-3 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition"
         :title="showSatellite ? 'Switch to street view' : 'Switch to satellite view'"
       >
-        <span class="text-xl">{{ showSatellite ? '🗺️' : '🛰️' }}</span>
+        <span class="text-xl">{{ showSatellite ? '🌲' : '🛰️' }}</span>
       </button>
     </div>
   </div>
@@ -61,7 +61,7 @@ onMounted(async () => {
   // Initialize map
   map.value = new mapboxgl.Map({
     container: container,
-    style: 'mapbox://styles/mapbox/streets-v11',
+    style: 'mapbox://styles/mapbox/outdoors-v12',
     center: [-98.5795, 39.8283],
     zoom: 3,
     attributionControl: false
