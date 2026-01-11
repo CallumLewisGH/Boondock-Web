@@ -10,6 +10,4 @@
 
 <script setup lang="ts">
 import Header from '@/components/Header.vue'
-// NOTICE: Do NOT import MapView or SearchView here. 
-// The router handles that automatically.
 </script>

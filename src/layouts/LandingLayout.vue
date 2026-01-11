@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import LandingHeader from '@/components/LandingHeader.vue'
+import LandingHeader from '@/components/Landing/LandingHeader.vue'
 
 const props = defineProps({
   activePage: {
