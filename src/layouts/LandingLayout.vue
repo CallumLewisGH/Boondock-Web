@@ -1,16 +1,14 @@
 <template>
-  <div class="min-h-screen transition-colors duration-300 font-sans" 
+  <div class="min-h-screen flex flex-col transition-colors duration-300 font-sans" 
        :style="{ backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }">
     
-    <!-- Header -->
-    <LandingHeader :active-page="activePage" />
+    <LandingHeader :active-page="activePage" class="flex-shrink-0" />
 
-    <!-- Main Content -->
-    <div class="flex-1 relative">
+    <main class="flex-1 pt-20">
       <router-view />
-    </div>
-    <!-- Simple Footer (keep it minimal but elegant) -->
-    <footer class="py-12 border-t"
+    </main>
+
+    <footer class="py-12 border-t flex-shrink-0"
             :style="{ 
               backgroundColor: 'var(--bg-color)',
               borderColor: 'var(--border)'
@@ -28,7 +26,7 @@
 <script setup lang="ts">
 import LandingHeader from '@/components/Landing/LandingHeader.vue'
 
-const props = defineProps({
+defineProps({
   activePage: {
     type: String,
     default: ''

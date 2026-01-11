@@ -1,10 +1,9 @@
 <template>
-  <div class="h-screen flex flex-col overflow-hidden">
-    <Header/>
-    
-    <div class="flex-1 relative">
+  <div class="h-screen flex flex-col">
+    <Header />
+    <main class="flex-1 overflow-y-auto pt-16"> 
       <router-view />
-    </div>
+    </main>
   </div>
 </template>
 
