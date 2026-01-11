@@ -1,6 +1,6 @@
 <template>
   <div class="h-screen flex flex-col overflow-hidden">
-    <Header />
+    <Header/>
     
     <div class="flex-1 relative">
       <router-view />
@@ -9,5 +9,5 @@
 </template>
 
 <script setup lang="ts">
-import Header from '@/components/Header.vue'
+import Header from '@/components/App/Header.vue'
 </script>

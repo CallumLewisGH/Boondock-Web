@@ -6,10 +6,9 @@
     <LandingHeader :active-page="activePage" />
 
     <!-- Main Content -->
-    <main class="pt-20">
-      <slot></slot>
-    </main>
-
+    <div class="flex-1 relative">
+      <router-view />
+    </div>
     <!-- Simple Footer (keep it minimal but elegant) -->
     <footer class="py-12 border-t"
             :style="{ 

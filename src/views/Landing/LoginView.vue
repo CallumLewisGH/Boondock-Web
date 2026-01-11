@@ -48,7 +48,7 @@
              :style="{ 
                backgroundColor: isDark ? 'var(--border)' : 'var(--surface)'
              }">
-          <img src="../assets/logo.svg" alt="Boondock Logo" class="w-20 h-auto"/>
+          <img src="../../assets/logo.svg" alt="Boondock Logo" class="w-20 h-auto"/>
         </div>
 
         <!-- Headline -->

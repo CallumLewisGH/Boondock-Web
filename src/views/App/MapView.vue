@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import MapboxMap from '@/components/MapboxMap.vue'
+import MapboxMap from '@/components/App/MapboxMap.vue'
 
 const mapboxToken = ref<string>('')
 

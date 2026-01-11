@@ -1,27 +1,37 @@
 // router/index.ts
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import Landing from '@/views/Landing/LandingView.vue'
+import LandingLayout from '@/layouts/LandingLayout.vue'
+import Home from '@/views/Landing/HomeView.vue'
 import About from '@/views/Landing/AboutView.vue'
 import Guidelines from '@/views/Landing/GuidelinesView.vue'
 import Contact from '@/views/Landing/ContactView.vue'
 import Login from '@/views/Landing/LoginView.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
-import MapView from '@/views/MapView.vue'
-import ProfileView from '@/views/ProfileView.vue'
-import SettingsView from '@/views/SettingsView.vue'
-import SearchView from '@/views/SearchView.vue'
-import CampsiteView from '@/views/CampsiteView.vue'
-import UserView from '@/views/UserView.vue'
+import MapView from '@/views/App/MapView.vue'
+import ProfileView from '@/views/App/ProfileView.vue'
+import SettingsView from '@/views/App/SettingsView.vue'
+import SearchView from '@/views/App/SearchView.vue'
+import CampsiteView from '@/views/App/CampsiteView.vue'
+import UserView from '@/views/App/UserView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', name: 'Landing', component: Landing },
-    { path: '/about', name: 'About', component: About },
-    { path: '/guidelines', name: 'Guidelines', component: Guidelines },
-    { path: '/contact', name: 'Contact', component: Contact },
-    { path: '/login', name: 'Login', component: Login, meta: { guestOnly: true } },
+    { path: '/', 
+      name: 'Landing', 
+      component: LandingLayout,
+      redirect: '/home',
+      children: [
+        { path: '/home', name: 'Home', component: Home},
+        { path: '/about', name: 'About', component: About },
+        { path: '/guidelines', name: 'Guidelines', component: Guidelines },
+        { path: '/contact', name: 'Contact', component: Contact },
+        { path: '/login', name: 'Login', component: Login, meta: { guestOnly: true } },
+      ] 
+    },
+    
     {
       path: '/app',
       name: 'App',
