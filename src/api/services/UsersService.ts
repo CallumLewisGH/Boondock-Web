@@ -2,142 +2,117 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { queryFilter_QueryParameter } from '../models/queryFilter_QueryParameter';
-import type { requests_CreateUserRequest } from '../models/requests_CreateUserRequest';
-import type { requests_UpdateUserRequest } from '../models/requests_UpdateUserRequest';
-import type { responses_UserPrivateProfileResponse } from '../models/responses_UserPrivateProfileResponse';
-import type { responses_UserPublicProfileResponse } from '../models/responses_UserPublicProfileResponse';
-import type { user_UserDTO } from '../models/user_UserDTO';
+import type { CreateUserRequest } from '../models/CreateUserRequest';
+import type { ErrorModel } from '../models/ErrorModel';
+import type { UpdateUserRequest } from '../models/UpdateUserRequest';
+import type { UserPrivateProfileResponse } from '../models/UserPrivateProfileResponse';
+import type { UserPublicProfileResponse } from '../models/UserPublicProfileResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class UsersService {
     /**
-     * Creates a new user
-     * Creates a new user with the provided details
-     * @param user User details
-     * @returns responses_UserPrivateProfileResponse Returns the created user
+     * Post users
+     * @param requestBody
+     * @returns UserPrivateProfileResponse OK
+     * @returns ErrorModel Error
      * @throws ApiError
      */
     public static postUsers(
-        user: requests_CreateUserRequest,
-    ): CancelablePromise<responses_UserPrivateProfileResponse> {
+        requestBody: CreateUserRequest,
+    ): CancelablePromise<UserPrivateProfileResponse | ErrorModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/users',
-            body: user,
-            errors: {
-                400: `Invalid request body`,
-                500: `Internal server error`,
-            },
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
     /**
-     * Get current authenticated user
-     * Returns information about the currently authenticated user
-     * @returns responses_UserPrivateProfileResponse Returns user object
+     * Get users me
+     * @returns UserPrivateProfileResponse OK
+     * @returns ErrorModel Error
      * @throws ApiError
      */
-    public static getUsersMe(): CancelablePromise<responses_UserPrivateProfileResponse> {
+    public static getUsersMe(): CancelablePromise<UserPrivateProfileResponse | ErrorModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/users/me',
-            errors: {
-                401: `Unauthorized`,
-                404: `User not found`,
-            },
         });
     }
     /**
-     * Get users with filtering and pagination
-     * Retrieves a list of users based on query filters
-     * @param request Query filters for users
-     * @returns user_UserDTO Returns the list of users
+     * Post users search
+     * @param requestBody
+     * @returns any[] OK
+     * @returns ErrorModel Error
      * @throws ApiError
      */
     public static postUsersSearch(
-        request: Array<queryFilter_QueryParameter>,
-    ): CancelablePromise<Array<user_UserDTO>> {
+        requestBody: any[] | null,
+    ): CancelablePromise<any[] | null | ErrorModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/users/search',
-            body: request,
-            errors: {
-                400: `Invalid request body`,
-                500: `Internal server error`,
-            },
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
     /**
-     * Returns the user with the specified ID
-     * Gets the user where ID is passed as a path parameter
-     * @param id User ID to retrieve
-     * @returns responses_UserPublicProfileResponse Returns the requested user
+     * Delete users by ID
+     * @param id User ID (UUID)
+     * @returns UserPrivateProfileResponse OK
+     * @returns ErrorModel Error
      * @throws ApiError
      */
-    public static getUsers(
+    public static deleteUsersById(
         id: string,
-    ): CancelablePromise<responses_UserPublicProfileResponse> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/users/{id}',
-            path: {
-                'id': id,
-            },
-            errors: {
-                400: `Invalid user ID format`,
-                404: `User not found`,
-                500: `Internal server error`,
-            },
-        });
-    }
-    /**
-     * Updates the user with the specified ID
-     * Updates the user where ID is passed as a path parameter
-     * @param id User ID to update
-     * @param user User update details
-     * @returns responses_UserPrivateProfileResponse Successfully updated user
-     * @throws ApiError
-     */
-    public static putUsers(
-        id: string,
-        user: requests_UpdateUserRequest,
-    ): CancelablePromise<responses_UserPrivateProfileResponse> {
-        return __request(OpenAPI, {
-            method: 'PUT',
-            url: '/users/{id}',
-            path: {
-                'id': id,
-            },
-            body: user,
-            errors: {
-                400: `Invalid user ID or request body`,
-                404: `User not found`,
-                500: `Internal server error`,
-            },
-        });
-    }
-    /**
-     * Deletes the user with the specified ID
-     * Deletes the user where ID is passed as a path parameter
-     * @param id User ID to delete
-     * @returns responses_UserPrivateProfileResponse Successfully deleted user
-     * @throws ApiError
-     */
-    public static deleteUsers(
-        id: string,
-    ): CancelablePromise<responses_UserPrivateProfileResponse> {
+    ): CancelablePromise<UserPrivateProfileResponse | ErrorModel> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/users/{id}',
             path: {
                 'id': id,
             },
-            errors: {
-                400: `Invalid user ID format`,
-                404: `User not found`,
-                500: `Internal server error`,
+        });
+    }
+    /**
+     * Get users by ID
+     * @param id User ID (UUID)
+     * @returns UserPublicProfileResponse OK
+     * @returns ErrorModel Error
+     * @throws ApiError
+     */
+    public static getUsersById(
+        id: string,
+    ): CancelablePromise<UserPublicProfileResponse | ErrorModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/users/{id}',
+            path: {
+                'id': id,
             },
+        });
+    }
+    /**
+     * Put users by ID
+     * @param id User ID (UUID)
+     * @param requestBody
+     * @returns UserPrivateProfileResponse OK
+     * @returns ErrorModel Error
+     * @throws ApiError
+     */
+    public static putUsersById(
+        id: string,
+        requestBody: UpdateUserRequest,
+    ): CancelablePromise<UserPrivateProfileResponse | ErrorModel> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/users/{id}',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 }
