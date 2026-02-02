@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type UserPublicProfileResponse = {
+export type UserPublicProfile = {
     /**
      * A URL to the JSON Schema for this object.
      */

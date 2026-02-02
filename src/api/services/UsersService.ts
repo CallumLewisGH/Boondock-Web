@@ -5,8 +5,8 @@
 import type { CreateUserRequest } from '../models/CreateUserRequest';
 import type { ErrorModel } from '../models/ErrorModel';
 import type { UpdateUserRequest } from '../models/UpdateUserRequest';
-import type { UserPrivateProfileResponse } from '../models/UserPrivateProfileResponse';
-import type { UserPublicProfileResponse } from '../models/UserPublicProfileResponse';
+import type { UserPrivateProfile } from '../models/UserPrivateProfile';
+import type { UserPublicProfile } from '../models/UserPublicProfile';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -14,13 +14,13 @@ export class UsersService {
     /**
      * Post users
      * @param requestBody
-     * @returns UserPrivateProfileResponse OK
+     * @returns UserPrivateProfile OK
      * @returns ErrorModel Error
      * @throws ApiError
      */
     public static postUsers(
         requestBody: CreateUserRequest,
-    ): CancelablePromise<UserPrivateProfileResponse | ErrorModel> {
+    ): CancelablePromise<UserPrivateProfile | ErrorModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/users',
@@ -30,11 +30,11 @@ export class UsersService {
     }
     /**
      * Get users me
-     * @returns UserPrivateProfileResponse OK
+     * @returns UserPrivateProfile OK
      * @returns ErrorModel Error
      * @throws ApiError
      */
-    public static getUsersMe(): CancelablePromise<UserPrivateProfileResponse | ErrorModel> {
+    public static getUsersMe(): CancelablePromise<UserPrivateProfile | ErrorModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/users/me',
@@ -59,14 +59,14 @@ export class UsersService {
     }
     /**
      * Delete users by ID
-     * @param id User ID (UUID)
-     * @returns UserPrivateProfileResponse OK
+     * @param id ID (UUID)
+     * @returns UserPrivateProfile OK
      * @returns ErrorModel Error
      * @throws ApiError
      */
     public static deleteUsersById(
         id: string,
-    ): CancelablePromise<UserPrivateProfileResponse | ErrorModel> {
+    ): CancelablePromise<UserPrivateProfile | ErrorModel> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/users/{id}',
@@ -77,14 +77,14 @@ export class UsersService {
     }
     /**
      * Get users by ID
-     * @param id User ID (UUID)
-     * @returns UserPublicProfileResponse OK
+     * @param id ID (UUID)
+     * @returns UserPublicProfile OK
      * @returns ErrorModel Error
      * @throws ApiError
      */
     public static getUsersById(
         id: string,
-    ): CancelablePromise<UserPublicProfileResponse | ErrorModel> {
+    ): CancelablePromise<UserPublicProfile | ErrorModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/users/{id}',
@@ -97,14 +97,14 @@ export class UsersService {
      * Put users by ID
      * @param id User ID (UUID)
      * @param requestBody
-     * @returns UserPrivateProfileResponse OK
+     * @returns UserPrivateProfile OK
      * @returns ErrorModel Error
      * @throws ApiError
      */
     public static putUsersById(
         id: string,
         requestBody: UpdateUserRequest,
-    ): CancelablePromise<UserPrivateProfileResponse | ErrorModel> {
+    ): CancelablePromise<UserPrivateProfile | ErrorModel> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/users/{id}',

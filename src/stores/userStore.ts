@@ -2,10 +2,10 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { AuthenticationService } from '@/authentication/AuthenticationService' // Ensure path matches your structure
-import type { UserPrivateProfileResponse } from '@/api'
+import type { UserPrivateProfile } from '@/api'
 
 export const useUserStore = defineStore('userStore', () => {
-  const user = ref<UserPrivateProfileResponse | null>(null)
+  const user = ref<UserPrivateProfile | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
 

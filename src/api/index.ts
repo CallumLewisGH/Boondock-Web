@@ -12,8 +12,8 @@ export type { ErrorDetail } from './models/ErrorDetail';
 export type { ErrorModel } from './models/ErrorModel';
 export type { QueryParameter } from './models/QueryParameter';
 export type { UpdateUserRequest } from './models/UpdateUserRequest';
-export type { UserPrivateProfileResponse } from './models/UserPrivateProfileResponse';
-export type { UserPublicProfileResponse } from './models/UserPublicProfileResponse';
+export type { UserPrivateProfile } from './models/UserPrivateProfile';
+export type { UserPublicProfile } from './models/UserPublicProfile';
 
 export { DatabaseService } from './services/DatabaseService';
 export { UsersService } from './services/UsersService';
