@@ -72,7 +72,7 @@
         <div class="flex items-center gap-2 mb-2">
           <span class="text-yellow-500">★★★★☆</span>
           <span class="text-sm text-gray-500">3 days ago</span>
-        </div>
+        </div> 
         <p>"Amazing spot with great views!"</p>
       </div>
     </div>

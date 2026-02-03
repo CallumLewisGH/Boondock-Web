@@ -1,7 +1,7 @@
 // stores/userStore.ts
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { AuthenticationService } from '@/authentication/AuthenticationService' // Ensure path matches your structure
+import { AuthenticationService } from '@/services/AuthenticationService'
 import type { UserPrivateProfile } from '@/api'
 
 export const useUserStore = defineStore('userStore', () => {
@@ -12,21 +12,15 @@ export const useUserStore = defineStore('userStore', () => {
   async function checkAuth() {
     loading.value = true;
     
-    // Check for token in URL and save it if found
     AuthenticationService.handleCallback();
-    
-    // Ensure headers are set
-    AuthenticationService.initializeGlobalAuth();
 
     try {
-      // Only fetch user if we actually have a token to use
       if (localStorage.getItem('jwt_token')) {
         user.value = await AuthenticationService.getCurrentUser();
       }
       error.value = null;
       return true;
     } catch (err: any) {
-      // If the fetch fails (invalid token), log out clean
       if (localStorage.getItem('jwt_token')) {
           console.error("Token verification failed", err);
           AuthenticationService.logout(); 

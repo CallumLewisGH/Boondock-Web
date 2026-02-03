@@ -5,12 +5,23 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 
 import App from './App.vue'
 import router from './router'
-import { OpenAPI } from './api'
+import { client } from './api/client.gen'
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
-OpenAPI.BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+
+client.interceptors.request.use((request) => {
+    const token = localStorage.getItem('jwt_token');
+    if (token) {
+        request.headers.set('Authorization', `Bearer ${token}`);
+    }
+    return request;
+});
+    
+client.setConfig({
+    baseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+});
 
 app.mount('#app')
