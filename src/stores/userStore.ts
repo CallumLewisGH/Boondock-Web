@@ -16,7 +16,12 @@ export const useUserStore = defineStore('userStore', () => {
 
     try {
       if (localStorage.getItem('jwt_token')) {
-        user.value = await UsersService.getCurrentUser();
+        const result = await UsersService.getCurrentUser();
+        if (!result.data) {
+          throw new Error('No user data returned');
+        }
+        
+        user.value = result.data;
       }
       error.value = null;
       return true;
