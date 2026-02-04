@@ -35,8 +35,4 @@ export class AuthenticationService {
         
         window.location.href = `${config.apiBaseUrl}/authentication/logout/${this._provider}`;
     }
-
-    public static async getCurrentUser(): Promise<any> {
-        return await getUsersMe();
-    }
 }

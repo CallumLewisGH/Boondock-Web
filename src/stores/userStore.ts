@@ -1,8 +1,8 @@
-// stores/userStore.ts
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { AuthenticationService } from '@/services/AuthenticationService'
 import type { UserPrivateProfile } from '@/api'
+import { UsersService } from '@/services/UsersService'
 
 export const useUserStore = defineStore('userStore', () => {
   const user = ref<UserPrivateProfile | null>(null)
@@ -16,7 +16,7 @@ export const useUserStore = defineStore('userStore', () => {
 
     try {
       if (localStorage.getItem('jwt_token')) {
-        user.value = await AuthenticationService.getCurrentUser();
+        user.value = await UsersService.getCurrentUser();
       }
       error.value = null;
       return true;

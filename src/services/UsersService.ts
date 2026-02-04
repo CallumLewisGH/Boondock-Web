@@ -1,5 +1,5 @@
-import { postUsersSearch } from "../api";
-import type { UserPublicProfile } from "../api";
+import { getUsersMe, postUsersSearch } from "../api";
+import type { UserPrivateProfile, UserPublicProfile } from "../api";
 import { UserQueryFilters } from "../queryFilters/userQueryFilters";
 import { QueryBuilder } from "../helpers/queryBuilder";
 
@@ -18,4 +18,14 @@ export class UsersService {
 
     return data;
   }
+
+    public static async getCurrentUser(): Promise<UserPrivateProfile> {
+        const {data, error} = await getUsersMe();
+
+        if (error || !data) {
+            console.error('Failed to get current user:', error);
+            throw error;
+        }
+        return data;
+    }
 }
