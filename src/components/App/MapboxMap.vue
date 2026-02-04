@@ -1,15 +1,7 @@
 <template>
   <div ref="mapContainer" class="map-container">
     <!-- Controls -->
-    <div class="absolute top-4 left-4 flex flex-col space-y-2 z-10">
-      <button 
-        @click="locateUser"
-        class="p-3 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition"
-        title="Find my location"
-      >
-        <span class="text-xl">📍</span>
-      </button>
-      
+    <div class="absolute top-4 left-4 flex flex-col space-y-2 z-10">      
       <button 
         @click="toggleLayer"
         class="p-3 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition"
