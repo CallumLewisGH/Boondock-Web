@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteUsersByIdData, DeleteUsersByIdErrors, DeleteUsersByIdResponses, GetDatabaseHealthData, GetDatabaseHealthErrors, GetDatabaseHealthResponses, GetUsersByIdData, GetUsersByIdErrors, GetUsersByIdResponses, GetUsersMeData, GetUsersMeErrors, GetUsersMeResponses, PostDatabaseMigrationsData, PostDatabaseMigrationsErrors, PostDatabaseMigrationsResponses, PostUsersData, PostUsersErrors, PostUsersResponses, PostUsersSearchData, PostUsersSearchErrors, PostUsersSearchResponses, PutUsersByIdData, PutUsersByIdErrors, PutUsersByIdResponses } from './types.gen';
+import type { DeleteUsersMeData, DeleteUsersMeErrors, DeleteUsersMeResponses, GetDatabaseHealthData, GetDatabaseHealthErrors, GetDatabaseHealthResponses, GetUsersByIdData, GetUsersByIdErrors, GetUsersByIdResponses, GetUsersMeData, GetUsersMeErrors, GetUsersMeResponses, PostDatabaseMigrationsData, PostDatabaseMigrationsErrors, PostDatabaseMigrationsResponses, PostUsersData, PostUsersErrors, PostUsersResponses, PostUsersSearchData, PostUsersSearchErrors, PostUsersSearchResponses, PutUsersMeData, PutUsersMeErrors, PutUsersMeResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -42,12 +42,34 @@ export const postUsers = <ThrowOnError extends boolean = false>(options: Options
 });
 
 /**
+ * Delete users me
+ */
+export const deleteUsersMe = <ThrowOnError extends boolean = false>(options?: Options<DeleteUsersMeData, ThrowOnError>) => (options?.client ?? client).delete<DeleteUsersMeResponses, DeleteUsersMeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/me',
+    ...options
+});
+
+/**
  * Get users me
  */
 export const getUsersMe = <ThrowOnError extends boolean = false>(options?: Options<GetUsersMeData, ThrowOnError>) => (options?.client ?? client).get<GetUsersMeResponses, GetUsersMeErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/users/me',
     ...options
+});
+
+/**
+ * Put users me
+ */
+export const putUsersMe = <ThrowOnError extends boolean = false>(options: Options<PutUsersMeData, ThrowOnError>) => (options.client ?? client).put<PutUsersMeResponses, PutUsersMeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/me',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
@@ -64,32 +86,10 @@ export const postUsersSearch = <ThrowOnError extends boolean = false>(options: O
 });
 
 /**
- * Delete users by ID
- */
-export const deleteUsersById = <ThrowOnError extends boolean = false>(options: Options<DeleteUsersByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteUsersByIdResponses, DeleteUsersByIdErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/users/{id}',
-    ...options
-});
-
-/**
  * Get users by ID
  */
 export const getUsersById = <ThrowOnError extends boolean = false>(options: Options<GetUsersByIdData, ThrowOnError>) => (options.client ?? client).get<GetUsersByIdResponses, GetUsersByIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/users/{id}',
     ...options
-});
-
-/**
- * Put users by ID
- */
-export const putUsersById = <ThrowOnError extends boolean = false>(options: Options<PutUsersByIdData, ThrowOnError>) => (options.client ?? client).put<PutUsersByIdResponses, PutUsersByIdErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/users/{id}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
 });

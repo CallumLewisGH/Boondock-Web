@@ -70,11 +70,11 @@ export type UpdateUserRequest = {
      * A URL to the JSON Schema for this object.
      */
     readonly $schema?: string;
-    Bio: string | null;
-    Email: string | null;
-    ProfilePicture: string | null;
-    Timezone: string | null;
-    Username: string | null;
+    bio?: string;
+    email?: string;
+    profilePicture?: string;
+    timezone?: string;
+    username?: string;
 };
 
 export type UserPrivateProfile = {
@@ -139,11 +139,11 @@ export type ErrorModelWritable = {
 };
 
 export type UpdateUserRequestWritable = {
-    Bio: string | null;
-    Email: string | null;
-    ProfilePicture: string | null;
-    Timezone: string | null;
-    Username: string | null;
+    bio?: string;
+    email?: string;
+    profilePicture?: string;
+    timezone?: string;
+    username?: string;
 };
 
 export type UserPrivateProfileWritable = {
@@ -241,6 +241,31 @@ export type PostUsersResponses = {
 
 export type PostUsersResponse = PostUsersResponses[keyof PostUsersResponses];
 
+export type DeleteUsersMeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/me';
+};
+
+export type DeleteUsersMeErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type DeleteUsersMeError = DeleteUsersMeErrors[keyof DeleteUsersMeErrors];
+
+export type DeleteUsersMeResponses = {
+    /**
+     * OK
+     */
+    200: UserPrivateProfile;
+};
+
+export type DeleteUsersMeResponse = DeleteUsersMeResponses[keyof DeleteUsersMeResponses];
+
 export type GetUsersMeData = {
     body?: never;
     path?: never;
@@ -266,6 +291,31 @@ export type GetUsersMeResponses = {
 
 export type GetUsersMeResponse = GetUsersMeResponses[keyof GetUsersMeResponses];
 
+export type PutUsersMeData = {
+    body: UpdateUserRequestWritable;
+    path?: never;
+    query?: never;
+    url: '/users/me';
+};
+
+export type PutUsersMeErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PutUsersMeError = PutUsersMeErrors[keyof PutUsersMeErrors];
+
+export type PutUsersMeResponses = {
+    /**
+     * OK
+     */
+    200: UserPrivateProfile;
+};
+
+export type PutUsersMeResponse = PutUsersMeResponses[keyof PutUsersMeResponses];
+
 export type PostUsersSearchData = {
     body: Array<QueryParameter> | null;
     path?: never;
@@ -290,36 +340,6 @@ export type PostUsersSearchResponses = {
 };
 
 export type PostUsersSearchResponse = PostUsersSearchResponses[keyof PostUsersSearchResponses];
-
-export type DeleteUsersByIdData = {
-    body?: never;
-    path: {
-        /**
-         * ID (UUID)
-         */
-        id: string;
-    };
-    query?: never;
-    url: '/users/{id}';
-};
-
-export type DeleteUsersByIdErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type DeleteUsersByIdError = DeleteUsersByIdErrors[keyof DeleteUsersByIdErrors];
-
-export type DeleteUsersByIdResponses = {
-    /**
-     * OK
-     */
-    200: UserPrivateProfile;
-};
-
-export type DeleteUsersByIdResponse = DeleteUsersByIdResponses[keyof DeleteUsersByIdResponses];
 
 export type GetUsersByIdData = {
     body?: never;
@@ -350,33 +370,3 @@ export type GetUsersByIdResponses = {
 };
 
 export type GetUsersByIdResponse = GetUsersByIdResponses[keyof GetUsersByIdResponses];
-
-export type PutUsersByIdData = {
-    body: UpdateUserRequestWritable;
-    path: {
-        /**
-         * User ID (UUID)
-         */
-        id: string;
-    };
-    query?: never;
-    url: '/users/{id}';
-};
-
-export type PutUsersByIdErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type PutUsersByIdError = PutUsersByIdErrors[keyof PutUsersByIdErrors];
-
-export type PutUsersByIdResponses = {
-    /**
-     * OK
-     */
-    200: UserPrivateProfile;
-};
-
-export type PutUsersByIdResponse = PutUsersByIdResponses[keyof PutUsersByIdResponses];
