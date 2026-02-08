@@ -56,6 +56,7 @@ onMounted(async () => {
     style: 'mapbox://styles/mapbox/outdoors-v12',
     center: [-98.5795, 39.8283],
     zoom: 3,
+    projection: { name: 'mercator' },
     attributionControl: false
   })
   
