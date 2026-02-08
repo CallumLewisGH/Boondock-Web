@@ -8,7 +8,8 @@ import {
 import type { 
     UserPrivateProfile, 
     UserPublicProfile,
-    UpdateUserRequest 
+    UpdateUserRequest, 
+    QueryParameter
 } from "../api";
 import { UserQueryFilters } from "../queryFilters/userQueryFilters";
 import { QueryBuilder } from "../helpers/queryBuilder";
@@ -19,10 +20,10 @@ export class UsersService {
      * POST /users/search
      * Fetches a list of public profiles based on query filters.
      */
-    public static async getUsers(): Promise<ApiResult<UserPublicProfile[]>> {
-        const query = new QueryBuilder()
-            .addParameter(UserQueryFilters.IsActive(false))
-            .build();
+    public static async getUsers(query?: QueryParameter[]): Promise<ApiResult<UserPublicProfile[]>> {
+        if (!query) {
+            query = new QueryBuilder().build();
+        }
 
         const { data, error, response } = await postUsersSearch({ body: query });
 
