@@ -127,6 +127,7 @@ async function openDropdown() {
     const result = await UsersService.getUsers();
     if (result.data) {
       userList.value = result.data;
+      filteredUserList.value = userList.value;
     }
   }
 }
