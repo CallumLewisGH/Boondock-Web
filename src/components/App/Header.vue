@@ -52,7 +52,7 @@
                   </div>
                 </div>
               </li>
-              
+
               <li class="flex items-center gap-3 p-2 rounded hover:bg-black/5 cursor-pointer transition">
                 <span>⛺</span>
                   <div>
@@ -143,8 +143,7 @@ async function openDropdown() {
 function selectUser(user: UserPublicProfile) {
   searchQuery.value = user.username;
   isDropdownOpen.value = false;
-  console.log('Selected user:', user);
-  // router.push(`/profile/${user.id}`); // Example navigation
+  router.push(`/app/users/${user.username}`);
 }
 
 // --- Keyboard Navigation ---

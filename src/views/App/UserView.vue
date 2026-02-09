@@ -1,110 +1,138 @@
 <template>
-  <div class="max-w-4xl mx-auto p-6">
-    <!-- Back button -->
-    <button 
-      @click="$router.back()"
-      class="mb-6 p-2 hover:bg-gray-100 rounded-lg"
-    >
-      ← Back
-    </button>
-    
-    <!-- Profile Header -->
+  <div v-if="userProfile" class="max-w-4xl mx-auto p-6 min-h-screen" style="color: var(--text-color);">
     <div class="flex items-center gap-6 mb-8">
-      <div class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-3xl">
-        👤
+      <div class="relative">
+        <div v-if="userProfile.profilePicture" 
+             class="w-24 h-24 rounded-full overflow-hidden border-2" 
+             style="border-color: var(--border);">
+          <img :src="formatBase64(userProfile.profilePicture)" alt="Profile Picture" class="w-full h-full object-cover" />
+        </div>
+        <div v-else class="w-24 h-24 rounded-full flex items-center justify-center text-3xl border-2" 
+             style="background-color: var(--surface); border-color: var(--border);">
+          👤
+        </div>
       </div>
       <div class="flex-1">
-        <h1 class="text-3xl font-bold">Mountain Mike</h1>
-        <p class="text-gray-600">High-altitude camping specialist</p>
-        <div class="flex gap-4 mt-3">
-          <span class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">
-            🏔️ Mountain Expert
-          </span>
-          <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-            🌿 Leave No Trace
-          </span>
-        </div>
-      </div>
-      <button 
-        @click="followUser"
-        class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-      >
-        {{ isFollowing ? 'Following' : 'Follow' }}
-      </button>
-    </div>
-    
-    <!-- Stats -->
-    <div class="grid grid-cols-3 gap-4 mb-8">
-      <div class="bg-white p-4 rounded-lg shadow text-center">
-        <div class="text-2xl font-bold">47</div>
-        <div class="text-sm text-gray-600">Campsites Found</div>
-      </div>
-      <div class="bg-white p-4 rounded-lg shadow text-center">
-        <div class="text-2xl font-bold">89</div>
-        <div class="text-sm text-gray-600">Reviews</div>
-      </div>
-      <div class="bg-white p-4 rounded-lg shadow text-center">
-        <div class="text-2xl font-bold">312</div>
-        <div class="text-sm text-gray-600">Followers</div>
+        <h1 class="text-3xl font-bold">{{ userProfile.username }}</h1>
+        <p v-if="userProfile.bio" class="text-sm mt-1 italic" style="color: var(--muted);">
+          "{{ userProfile.bio }}"
+        </p>
+        <p class="text-xs mt-2" style="color: var(--muted);">
+          Member since {{ new Date(userProfile.createdAt).toLocaleDateString() }}
+        </p>
       </div>
     </div>
     
-    <!-- Bio -->
-    <div class="mb-8">
-      <h2 class="text-xl font-bold mb-3">About</h2>
-      <p class="text-gray-700">
-        I've been wild camping in the UK mountains for over 10 years. 
-        Specialize in high-altitude spots and winter camping. 
-        Always practice Leave No Trace principles and love sharing remote locations 
-        with responsible campers.
-      </p>
-    </div>
-    
-    <!-- Recent Activity -->
-    <div>
-      <h2 class="text-xl font-bold mb-4">Recent Activity</h2>
-      <div class="space-y-4">
-        <div class="bg-white p-4 rounded-lg shadow">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="text-green-600">📍</span>
-            <span class="font-medium">Discovered new campsite</span>
-            <span class="text-sm text-gray-500 ml-auto">2 days ago</span>
-          </div>
-          <p class="text-gray-700">"High Peak Summit" in the Cairngorms</p>
-        </div>
-        
-        <div class="bg-white p-4 rounded-lg shadow">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="text-blue-600">✍️</span>
-            <span class="font-medium">Wrote a review</span>
-            <span class="text-sm text-gray-500 ml-auto">1 week ago</span>
-          </div>
-          <p class="text-gray-700">"Great remote spot with amazing views" ★★★★★</p>
-        </div>
-        
-        <div class="bg-white p-4 rounded-lg shadow">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="text-purple-600">📸</span>
-            <span class="font-medium">Added photos</span>
-            <span class="text-sm text-gray-500 ml-auto">2 weeks ago</span>
-          </div>
-          <p class="text-gray-700">10 photos from "Forest Valley Camp"</p>
-        </div>
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div class="p-4 rounded-xl shadow-sm text-center border" style="background-color: var(--card-bg); border-color: var(--border);">
+        <div class="text-2xl font-bold" style="color: var(--accent);">0</div>
+        <div class="text-sm" style="color: var(--muted);">Campsites Found</div>
+      </div>
+      <div class="p-4 rounded-xl shadow-sm text-center border" style="background-color: var(--card-bg); border-color: var(--border);">
+        <div class="text-2xl font-bold" style="color: var(--accent);">0</div>
+        <div class="text-sm" style="color: var(--muted);">Reviews Made</div>
       </div>
     </div>
+
+    <div class="border-b mb-6" style="border-color: var(--border);">
+      <div class="flex space-x-4">
+        <button v-for="tab in publicTabs" :key="tab.id" @click="activeTab = tab.id"
+          :class="['px-4 py-2 font-medium transition-all border-b-2']"
+          :style="{
+            borderColor: activeTab === tab.id ? 'var(--accent)' : 'transparent',
+            color: activeTab === tab.id ? 'var(--accent)' : 'var(--muted)'
+          }">
+          {{ tab.label }}
+        </button>
+      </div>
+    </div>
+
+    <div v-if="activeTab === 'campsites'" class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
+         style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
+      {{ userProfile.username }} hasn't posted any campsites yet.
+    </div>
+    <div v-else-if="activeTab === 'reviews'" class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
+         style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
+      No reviews yet.
+    </div>
+  </div>
+
+  <div v-else-if="loading" class="flex justify-center items-center min-h-[400px]">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2" style="border-color: var(--accent);"></div>
+  </div>
+
+  <div v-else class="flex flex-col justify-center items-center min-h-[400px] text-center">
+    <span class="text-5xl mb-4">🕵️‍♂️</span>
+    <h2 class="text-xl font-bold">User not found</h2>
+    <p style="color: var(--muted);">The adventurer you are looking for doesn't exist.</p>
+    <button @click="router.push('/app/map')" class="mt-4 text-accent underline">Back to Map</button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { UserPublicProfile } from '@/api'
+import { formatBase64 } from '@/helpers/base64'
+import { UsersService } from '@/services/UsersService'
+import { QueryBuilder } from '@/helpers/queryBuilder'
+import { UserQueryFilters } from '@/queryFilters/userQueryFilters'
 
 const route = useRoute()
-const userId = route.params.id
-const isFollowing = ref(false)
+const router = useRouter()
 
-const followUser = () => {
-  isFollowing.value = !isFollowing.value
-  alert(isFollowing.value ? 'You are now following this user' : 'Unfollowed user')
+const publicTabs = [
+  { id: 'campsites', label: 'Campsites' },
+  { id: 'reviews', label: 'Reviews' }
+]
+
+const activeTab = ref('campsites')
+const userProfile = ref<UserPublicProfile | null>(null)
+const loading = ref(true)
+
+async function fetchUser() {
+  // Use 'name' because your route is defined as /users/:name
+  const username = route.params.name as string
+  
+  if (!username) {
+    loading.value = false
+    return
+  }
+
+  loading.value = true
+
+  try {
+    const query = new QueryBuilder()
+      .addParameter(UserQueryFilters.WithUsernames([username]))
+      .build()
+
+    const result = await UsersService.getUsers(query)
+
+    if (result.data && result.data.length > 0) {
+      if (!result.data[0]) {
+        console.error("❌ User not found in DB");
+        // router.push('/'); 
+        return;
+      };
+      userProfile.value = result.data[0];
+    } else {
+      userProfile.value = null
+      console.warn(`No user found with username: ${username}`)
+    }
+  } catch (err) {
+    userProfile.value = null
+    console.error('Failed to fetch user:', err)
+  } finally {
+    loading.value = false
+  }
 }
+
+// Watch 'name' param for changes to allow searching while already on a profile page
+watch(() => route.params.name, () => {
+  fetchUser()
+})
+
+onMounted(() => {
+  fetchUser()
+})
 </script>

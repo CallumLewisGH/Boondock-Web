@@ -40,10 +40,9 @@ const router = createRouter({
       redirect: '/app/map',
       children: [
         { path: 'map', name: 'Map', component: MapView, meta: { title: 'Map' } },
-        { path: 'search', name: 'Search', component: SearchView, meta: { title: 'Search' } },
-        { path: 'campsites/:id', name: 'Campsite', component: CampsiteView, meta: { title: 'Campsite Details' }, props: true },
+        { path: 'campsites/:name', name: 'Campsite', component: CampsiteView, meta: { title: 'Campsite Details' }, props: true },
         { path: 'profile', name: 'Profile', component: ProfileView, meta: { title: 'Profile' } },
-        { path: 'users/:id', name: 'User', component: UserView, meta: { title: 'User Profile' }, props: true },
+        { path: 'users/:name', name: 'User', component: UserView, meta: { title: 'User Profile' } },
         { path: 'settings', name: 'Settings', component: SettingsView, meta: { title: 'Settings' } }
       ]
     },
