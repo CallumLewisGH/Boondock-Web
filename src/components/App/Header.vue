@@ -123,19 +123,10 @@ watch(searchQuery, (newQuery) => {
 
 async function openDropdown() {
   isDropdownOpen.value = true;
-  
-  // Prevent re-fetching if we already have data (optional optimization)
   if (userList.value.length === 0) {
     const result = await UsersService.getUsers();
     if (result.data) {
       userList.value = result.data;
-      // Initialize with full list or duplicates for testing as you requested
-      filteredUserList.value = [...result.data]; 
-      
-      // Duplicating data for testing scroll (as requested in prompt)
-      for(let i=0; i<5; i++) {
-         filteredUserList.value = [...filteredUserList.value, ...result.data];
-      }
     }
   }
 }
