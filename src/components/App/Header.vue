@@ -127,15 +127,23 @@ async function openDropdown() {
     const result = await UsersService.getUsers();
     if (result.data) {
       userList.value = result.data;
-      filteredUserList.value = userList.value;
+      filteredUserList.value = userList.value
     }
   }
 }
 
 function selectUser(user: UserPublicProfile) {
-  searchQuery.value = user.username;
   isDropdownOpen.value = false;
+  
+  selectedIndex.value = -1;
+
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+
   router.push(`/app/users/${user.username}`);
+  
+  searchQuery.value = ''; 
 }
 
 // --- Keyboard Navigation ---
