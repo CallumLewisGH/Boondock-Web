@@ -4,6 +4,32 @@ export type ClientOptions = {
     baseUrl: 'http://localhost:8080' | (string & {});
 };
 
+export type CampsiteProfile = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    createdAt: string;
+    description: string;
+    id: string;
+    latitude: number;
+    longitude: number;
+    name: string;
+    ownerId: string;
+    updatedAt: string;
+};
+
+export type CreateCampsiteRequest = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    Description: string;
+    Latitude: number | null;
+    Longitude: number | null;
+    Name: string;
+};
+
 export type CreateUserRequest = {
     /**
      * A URL to the JSON Schema for this object.
@@ -65,6 +91,17 @@ export type QueryParameter = {
     Value: Array<string> | null;
 };
 
+export type UpdateCampsiteRequest = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    description?: string;
+    latitude?: number;
+    longitude?: number;
+    name?: string;
+};
+
 export type UpdateUserRequest = {
     /**
      * A URL to the JSON Schema for this object.
@@ -105,6 +142,24 @@ export type UserPublicProfile = {
     username: string;
 };
 
+export type CampsiteProfileWritable = {
+    createdAt: string;
+    description: string;
+    id: string;
+    latitude: number;
+    longitude: number;
+    name: string;
+    ownerId: string;
+    updatedAt: string;
+};
+
+export type CreateCampsiteRequestWritable = {
+    Description: string;
+    Latitude: number | null;
+    Longitude: number | null;
+    Name: string;
+};
+
 export type CreateUserRequestWritable = {
     AuthId: string;
     Email: string;
@@ -138,6 +193,13 @@ export type ErrorModelWritable = {
     type?: string;
 };
 
+export type UpdateCampsiteRequestWritable = {
+    description?: string;
+    latitude?: number;
+    longitude?: number;
+    name?: string;
+};
+
 export type UpdateUserRequestWritable = {
     bio?: string;
     email?: string;
@@ -165,6 +227,143 @@ export type UserPublicProfileWritable = {
     profilePicture?: string;
     username: string;
 };
+
+export type PostCampsitesData = {
+    body: CreateCampsiteRequestWritable;
+    path?: never;
+    query?: never;
+    url: '/campsites';
+};
+
+export type PostCampsitesErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PostCampsitesError = PostCampsitesErrors[keyof PostCampsitesErrors];
+
+export type PostCampsitesResponses = {
+    /**
+     * OK
+     */
+    200: CampsiteProfile;
+};
+
+export type PostCampsitesResponse = PostCampsitesResponses[keyof PostCampsitesResponses];
+
+export type PostCampsitesSearchData = {
+    body: Array<QueryParameter> | null;
+    path?: never;
+    query?: never;
+    url: '/campsites/search';
+};
+
+export type PostCampsitesSearchErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PostCampsitesSearchError = PostCampsitesSearchErrors[keyof PostCampsitesSearchErrors];
+
+export type PostCampsitesSearchResponses = {
+    /**
+     * OK
+     */
+    200: Array<CampsiteProfile> | null;
+};
+
+export type PostCampsitesSearchResponse = PostCampsitesSearchResponses[keyof PostCampsitesSearchResponses];
+
+export type DeleteCampsitesByIdData = {
+    body?: never;
+    path: {
+        /**
+         * ID (UUID)
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/campsites/{id}';
+};
+
+export type DeleteCampsitesByIdErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type DeleteCampsitesByIdError = DeleteCampsitesByIdErrors[keyof DeleteCampsitesByIdErrors];
+
+export type DeleteCampsitesByIdResponses = {
+    /**
+     * OK
+     */
+    200: CampsiteProfile;
+};
+
+export type DeleteCampsitesByIdResponse = DeleteCampsitesByIdResponses[keyof DeleteCampsitesByIdResponses];
+
+export type GetCampsitesByIdData = {
+    body?: never;
+    path: {
+        /**
+         * ID (UUID)
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/campsites/{id}';
+};
+
+export type GetCampsitesByIdErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetCampsitesByIdError = GetCampsitesByIdErrors[keyof GetCampsitesByIdErrors];
+
+export type GetCampsitesByIdResponses = {
+    /**
+     * OK
+     */
+    200: CampsiteProfile;
+};
+
+export type GetCampsitesByIdResponse = GetCampsitesByIdResponses[keyof GetCampsitesByIdResponses];
+
+export type PatchCampsitesByIdData = {
+    body: UpdateCampsiteRequestWritable;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/campsites/{id}';
+};
+
+export type PatchCampsitesByIdErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PatchCampsitesByIdError = PatchCampsitesByIdErrors[keyof PatchCampsitesByIdErrors];
+
+export type PatchCampsitesByIdResponses = {
+    /**
+     * OK
+     */
+    200: CampsiteProfile;
+};
+
+export type PatchCampsitesByIdResponse = PatchCampsitesByIdResponses[keyof PatchCampsitesByIdResponses];
 
 export type GetDatabaseHealthData = {
     body?: never;
@@ -291,30 +490,30 @@ export type GetUsersMeResponses = {
 
 export type GetUsersMeResponse = GetUsersMeResponses[keyof GetUsersMeResponses];
 
-export type PutUsersMeData = {
+export type PatchUsersMeData = {
     body: UpdateUserRequestWritable;
     path?: never;
     query?: never;
     url: '/users/me';
 };
 
-export type PutUsersMeErrors = {
+export type PatchUsersMeErrors = {
     /**
      * Error
      */
     default: ErrorModel;
 };
 
-export type PutUsersMeError = PutUsersMeErrors[keyof PutUsersMeErrors];
+export type PatchUsersMeError = PatchUsersMeErrors[keyof PatchUsersMeErrors];
 
-export type PutUsersMeResponses = {
+export type PatchUsersMeResponses = {
     /**
      * OK
      */
     200: UserPrivateProfile;
 };
 
-export type PutUsersMeResponse = PutUsersMeResponses[keyof PutUsersMeResponses];
+export type PatchUsersMeResponse = PatchUsersMeResponses[keyof PatchUsersMeResponses];
 
 export type PostUsersSearchData = {
     body: Array<QueryParameter> | null;

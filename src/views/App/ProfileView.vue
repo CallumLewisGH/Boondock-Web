@@ -84,8 +84,14 @@
     <div v-else-if="activeTab === 'edit'" class="space-y-4">
       <div class="p-6 rounded-xl shadow-md border" 
            style="background-color: var(--card-bg); border-color: var(--border);">
+        <div class="flex items-center justify-between mb-6">
         <h3 class="font-bold mb-4 text-lg">Edit Profile</h3>
-        
+        <button @click="handleUserDelete" 
+                  class="text-xs font-bold uppercase text-red-500 hover:opacity-70 transition-opacity"
+                  :disabled="deleting">
+            {{ deleting ? 'Deleting...' : 'Delete User' }}
+          </button>
+        </div>
         <form @submit.prevent="handleSaveProfile" class="space-y-4">
           <div>
             <label class="block text-sm font-medium mb-1">Username</label>
@@ -139,6 +145,8 @@
 import type { UpdateUserRequest, UserPrivateProfile } from '@/api';
 import { formatBase64 } from '@/helpers/base64';
 import { getDirtyFields, hasChanged, syncRequest } from '@/helpers/diff';
+import router from '@/router';
+import { AuthenticationService } from '@/services/AuthenticationService';
 import { UsersService } from '@/services/UsersService';
 import { ref, reactive, onMounted, computed } from 'vue'
 
@@ -148,7 +156,8 @@ const tabs = [
   { id: 'edit', label: 'Edit Profile' }
 ]
 
-const activeTab = ref('campsites')
+const deleting = ref<boolean>(false);
+const activeTab = ref('campsites');
 const userProfile = ref<UserPrivateProfile | null>(null);
 const isSaving = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -173,6 +182,12 @@ onMounted(async function() {
     syncRequest(editRequest, result.data);
   }
 });
+
+async function handleUserDelete() {
+  const result = await UsersService.deleteCurrentUser();
+  AuthenticationService.logout();
+}
+
 
 function handleFileChange(event: Event) {
   const target = event.target as HTMLInputElement;

@@ -1,7 +1,7 @@
 import { 
     getUsersMe, 
     postUsersSearch, 
-    putUsersMe, 
+    patchUsersMe, 
     deleteUsersMe,
     getUsersById,
 } from "../api";
@@ -11,7 +11,6 @@ import type {
     UpdateUserRequest, 
     QueryParameter
 } from "../api";
-import { UserQueryFilters } from "../queryFilters/userQueryFilters";
 import { QueryBuilder } from "../helpers/queryBuilder";
 import type { ApiResult } from "@/helpers/apiResult";
 
@@ -51,11 +50,11 @@ export class UsersService {
     }
 
     /**
-     * PUT /users/me
+     * PATCH /users/me
      * Updates the authenticated user's profile.
      */
     public static async updateCurrentUser(body: UpdateUserRequest): Promise<ApiResult<UserPrivateProfile>> {
-        const { data, error, response } = await putUsersMe({ body: body });
+        const { data, error, response } = await patchUsersMe({ body: body });
 
         return { data, error, status: response.status } as ApiResult<UserPrivateProfile>;
     }

@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteUsersMeData, DeleteUsersMeErrors, DeleteUsersMeResponses, GetDatabaseHealthData, GetDatabaseHealthErrors, GetDatabaseHealthResponses, GetUsersByIdData, GetUsersByIdErrors, GetUsersByIdResponses, GetUsersMeData, GetUsersMeErrors, GetUsersMeResponses, PostDatabaseMigrationsData, PostDatabaseMigrationsErrors, PostDatabaseMigrationsResponses, PostUsersData, PostUsersErrors, PostUsersResponses, PostUsersSearchData, PostUsersSearchErrors, PostUsersSearchResponses, PutUsersMeData, PutUsersMeErrors, PutUsersMeResponses } from './types.gen';
+import type { DeleteCampsitesByIdData, DeleteCampsitesByIdErrors, DeleteCampsitesByIdResponses, DeleteUsersMeData, DeleteUsersMeErrors, DeleteUsersMeResponses, GetCampsitesByIdData, GetCampsitesByIdErrors, GetCampsitesByIdResponses, GetDatabaseHealthData, GetDatabaseHealthErrors, GetDatabaseHealthResponses, GetUsersByIdData, GetUsersByIdErrors, GetUsersByIdResponses, GetUsersMeData, GetUsersMeErrors, GetUsersMeResponses, PatchCampsitesByIdData, PatchCampsitesByIdErrors, PatchCampsitesByIdResponses, PatchUsersMeData, PatchUsersMeErrors, PatchUsersMeResponses, PostCampsitesData, PostCampsitesErrors, PostCampsitesResponses, PostCampsitesSearchData, PostCampsitesSearchErrors, PostCampsitesSearchResponses, PostDatabaseMigrationsData, PostDatabaseMigrationsErrors, PostDatabaseMigrationsResponses, PostUsersData, PostUsersErrors, PostUsersResponses, PostUsersSearchData, PostUsersSearchErrors, PostUsersSearchResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -17,6 +17,63 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: Record<string, unknown>;
 };
+
+/**
+ * Post campsites
+ */
+export const postCampsites = <ThrowOnError extends boolean = false>(options: Options<PostCampsitesData, ThrowOnError>) => (options.client ?? client).post<PostCampsitesResponses, PostCampsitesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/campsites',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Post campsites search
+ */
+export const postCampsitesSearch = <ThrowOnError extends boolean = false>(options: Options<PostCampsitesSearchData, ThrowOnError>) => (options.client ?? client).post<PostCampsitesSearchResponses, PostCampsitesSearchErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/campsites/search',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete campsites by ID
+ */
+export const deleteCampsitesById = <ThrowOnError extends boolean = false>(options: Options<DeleteCampsitesByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteCampsitesByIdResponses, DeleteCampsitesByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/campsites/{id}',
+    ...options
+});
+
+/**
+ * Get campsites by ID
+ */
+export const getCampsitesById = <ThrowOnError extends boolean = false>(options: Options<GetCampsitesByIdData, ThrowOnError>) => (options.client ?? client).get<GetCampsitesByIdResponses, GetCampsitesByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/campsites/{id}',
+    ...options
+});
+
+/**
+ * Patch campsites by ID
+ */
+export const patchCampsitesById = <ThrowOnError extends boolean = false>(options: Options<PatchCampsitesByIdData, ThrowOnError>) => (options.client ?? client).patch<PatchCampsitesByIdResponses, PatchCampsitesByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/campsites/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get database health
@@ -60,9 +117,9 @@ export const getUsersMe = <ThrowOnError extends boolean = false>(options?: Optio
 });
 
 /**
- * Put users me
+ * Patch users me
  */
-export const putUsersMe = <ThrowOnError extends boolean = false>(options: Options<PutUsersMeData, ThrowOnError>) => (options.client ?? client).put<PutUsersMeResponses, PutUsersMeErrors, ThrowOnError>({
+export const patchUsersMe = <ThrowOnError extends boolean = false>(options: Options<PatchUsersMeData, ThrowOnError>) => (options.client ?? client).patch<PatchUsersMeResponses, PatchUsersMeErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/users/me',
     ...options,
