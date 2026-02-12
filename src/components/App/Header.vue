@@ -1,8 +1,7 @@
-<!-- WARNING HEAVILY VIBE CODED -->
 <template>
   <div class="fixed top-0 left-0 right-0 z-50" style="background-color: var(--header-bg); color: var(--header-text);">
     <div class="flex items-center justify-between p-4">
-      <button @click="goHome()" class="flex items-center gap-2">
+      <button @click="goHome()" class="flex-shrink-0 flex items-center gap-2">
         <span class="font-bold text-xl" style="color: var(--header-text);">Boondock</span>
       </button>
       
@@ -19,7 +18,7 @@
 
         <div 
           v-if="isDropdownOpen"
-          class="absolute top-full left-0 right-0 mt-2 rounded-lg shadow-xl border z-50 flex flex-col"
+          class="absolute top-full left-0 right-0 mt-2 rounded-lg shadow-xl border z-50 flex flex-col overflow-hidden"
           style="background-color: var(--card-bg); border-color: var(--border); color: var(--text-color); max-height: 400px;"
         >
           <div class="p-2 overflow-y-auto" ref="resultsList">
@@ -31,33 +30,44 @@
                 :key="user.id || index"
                 @click="selectUser(user)"
                 @mouseover="selectedIndex = index"
-                class="flex items-center gap-3 p-2 rounded cursor-pointer transition"
+                class="flex items-center gap-3 p-2 rounded cursor-pointer transition min-w-0"
                 :class="{ 'bg-black/10 dark:bg-white/10': index === selectedIndex }"
               >
-                <div v-if="user.profilePicture" 
-                     class="w-10 h-10 min-w-[2.5rem] rounded-full overflow-hidden border-2" 
-                     style="border-color: var(--border);">
-                  <img :src="formatBase64(user.profilePicture)" alt="Profile" class="w-full h-full object-cover" />
-                </div>
-                <div v-else 
-                     class="w-10 h-10 min-w-[2.5rem] rounded-full flex items-center justify-center text-xl border-2" 
-                     style="background-color: var(--surface); border-color: var(--border);">
-                  👤
+                <div class="flex-shrink-0">
+                  <div v-if="user.profilePicture" 
+                       class="w-10 h-10 rounded-full overflow-hidden border-2" 
+                       style="border-color: var(--border);">
+                    <img :src="formatBase64(user.profilePicture)" alt="Profile" class="w-full h-full object-cover" />
+                  </div>
+                  <div v-else 
+                       class="w-10 h-10 rounded-full flex items-center justify-center text-xl border-2" 
+                       style="background-color: var(--surface); border-color: var(--border);">
+                    👤
+                  </div>
                 </div>
 
-                <div class="overflow-hidden">
+                <div class="flex-1 min-w-0">
                   <div class="font-medium truncate">{{ user.username }}</div>
-                  <div class="text-xs opacity-70 truncate">
+                  <div class="text-xs opacity-70 line-clamp-1 break-all">
                     {{ user.bio || 'No bio available' }}
                   </div>
                 </div>
               </li>
 
-              <li v-for="(camp, index) in filteredCampsiteList" :key="camp.id" @click="selectCampsite(camp)" @mouseover="selectedIndex = index + filteredUserList.length" class="flex items-center gap-3 p-2 rounded cursor-pointer hover:bg-black/5 transition" :class="{ 'bg-black/10 dark:bg-white/10': (index + filteredUserList.length) === selectedIndex }">
-                <span>⛺</span>
-                <div>
+              <li 
+                v-for="(camp, index) in filteredCampsiteList" 
+                :key="camp.id" 
+                @click="selectCampsite(camp)" 
+                @mouseover="selectedIndex = index + filteredUserList.length" 
+                class="flex items-center gap-3 p-2 rounded cursor-pointer transition min-w-0" 
+                :class="{ 'bg-black/10 dark:bg-white/10': (index + filteredUserList.length) === selectedIndex }"
+              >
+                <span class="flex-shrink-0 text-xl">⛺</span>
+                <div class="flex-1 min-w-0">
                   <div class="font-medium truncate">{{ camp.name }}</div>
-                  <div class="text-xs opacity-70 truncate">{{ camp.description || 'No description' }}</div>
+                  <div class="text-xs opacity-70 line-clamp-1 break-all">
+                    {{ camp.description || 'No description' }}
+                  </div>
                 </div>
               </li>
             </ul>
@@ -69,7 +79,7 @@
         </div>
       </div>
       
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 flex-shrink-0">
         <button @click="toggleDarkMode" class="p-2 rounded-full hover:opacity-80" style="color: var(--header-text); background-color: var(--accent);">
           {{ isDark ? '☀️' : '🌙' }}
         </button>
