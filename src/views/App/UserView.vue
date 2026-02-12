@@ -51,24 +51,34 @@
       <div v-if="activeTab === 'campsites'">
         <div v-if="userCampsites && userCampsites.length > 0" class="grid gap-4">
           <div 
-            v-for="camp in userCampsites" 
-            :key="camp.id" 
-            @click="selectCampsite(camp)"
-            class="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:scale-[1.01] transition-all"
-            style="background-color: var(--card-bg); border-color: var(--border);"
-          >
-            <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" style="background-color: var(--surface);">
-              ⛺
-            </div>
-            <div class="flex-1 min-w-0">
-              <h3 class="font-bold truncate" style="color: var(--text-color);">{{ camp.name }}</h3>
-              <p class="text-sm truncate" style="color: var(--muted);">{{ camp.description || 'No description provided.' }}</p>
-            </div>
-            <div class="text-accent">
-              <span class="text-xl">›</span>
-            </div>
+          v-for="camp in userCampsites" 
+          :key="camp.id" 
+          @click="selectCampsite(camp)"
+          class="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:scale-[1.01] transition-all overflow-hidden"
+          style="background-color: var(--card-bg); border-color: var(--border);"
+        >
+          <div class="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-2xl" style="background-color: var(--surface);">
+            ⛺
+          </div>
+
+          <div class="flex-1 min-w-0">
+            <h3 class="font-bold truncate text-lg" style="color: var(--text-color);">
+              {{ camp.name }}
+            </h3>
+            
+            <p 
+              class="text-sm break-words line-clamp-2 whitespace-normal" 
+              style="color: var(--muted); display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;"
+            >
+              {{ camp.description || 'No description provided.' }}
+            </p>
+          </div>
+
+          <div class="flex-shrink-0 ml-2" style="color: var(--accent);">
+            <span class="text-xl">›</span>
           </div>
         </div>
+      </div>
         <div v-else class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
              style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
           {{ userProfile.username }} hasn't posted any campsites yet.
