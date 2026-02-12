@@ -97,9 +97,9 @@ onMounted(async () => {
   map.value = new mapboxgl.Map({
     container: mapContainer.value,
     style: 'mapbox://styles/mapbox/outdoors-v12',
-    center: [-98.5795, 39.8283],
+    center: [-1.1743, 52.3555],
+    zoom: 5.5,
     projection: {name: 'mercator'},
-    zoom: 3,
     attributionControl: false
   })
 
