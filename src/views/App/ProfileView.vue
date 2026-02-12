@@ -43,7 +43,7 @@
     <div class="grid grid-cols-2 gap-4 mb-8">
       <div class="p-4 rounded-xl shadow-sm text-center border" 
            style="background-color: var(--card-bg); border-color: var(--border);">
-        <div class="text-2xl font-bold" style="color: var(--accent);">0</div>
+        <div class="text-2xl font-bold" style="color: var(--accent);">{{ userCampsites.length }}</div>
         <div class="text-sm" style="color: var(--muted);">Campsites Found</div>
       </div>
       <div class="p-4 rounded-xl shadow-sm text-center border" 
@@ -69,10 +69,31 @@
       </div>
     </div>
     
-    <div v-if="activeTab === 'campsites'" 
-         class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
-         style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
-      No campsites found yet.
+    <div v-if="activeTab === 'campsites'">
+      <div v-if="userCampsites.length > 0" class="grid gap-4">
+        <div 
+          v-for="camp in userCampsites" 
+          :key="camp.id" 
+          @click="selectCampsite(camp)"
+          class="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:scale-[1.01] transition-all"
+          style="background-color: var(--card-bg); border-color: var(--border);"
+        >
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" style="background-color: var(--surface);">
+            ⛺
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-bold truncate" style="color: var(--text-color);">{{ camp.name }}</h3>
+            <p class="text-sm truncate" style="color: var(--muted);">{{ camp.description || 'No description provided.' }}</p>
+          </div>
+          <div style="color: var(--accent);">
+            <span class="text-xl">›</span>
+          </div>
+        </div>
+      </div>
+      <div v-else class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
+           style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
+        You haven't posted any campsites yet.
+      </div>
     </div>
 
     <div v-else-if="activeTab === 'reviews'" 
@@ -142,14 +163,18 @@
 </template>
 
 <script setup lang="ts">
-import type { UpdateUserRequest, UserPrivateProfile } from '@/api';
+import type { UpdateUserRequest, UserPrivateProfile, CampsiteProfile } from '@/api';
 import { formatBase64 } from '@/helpers/base64';
 import { getDirtyFields, hasChanged, syncRequest } from '@/helpers/diff';
-import router from '@/router';
+import { useRouter } from 'vue-router';
 import { AuthenticationService } from '@/services/AuthenticationService';
 import { UsersService } from '@/services/UsersService';
+import { CampsitesService } from '@/services/CampsitesService';
+import { QueryBuilder } from '@/helpers/queryBuilder';
+import { CampsiteQueryFilters } from '@/queryFilters/campsiteQueryFilters';
 import { ref, reactive, onMounted, computed } from 'vue'
 
+const router = useRouter();
 const tabs = [
   { id: 'campsites', label: 'My Campsites' },
   { id: 'reviews', label: 'Reviews' },
@@ -159,6 +184,7 @@ const tabs = [
 const deleting = ref<boolean>(false);
 const activeTab = ref('campsites');
 const userProfile = ref<UserPrivateProfile | null>(null);
+const userCampsites = ref<CampsiteProfile[]>([]);
 const isSaving = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
 
@@ -175,19 +201,39 @@ const hasChanges = computed(function() {
   return hasChanged(userProfile.value, editRequest);
 });
 
+async function fetchUserCampsites() {
+  if (!userProfile.value) return;
+  const query = new QueryBuilder()
+    .addParameter(CampsiteQueryFilters.WithOwnerId(userProfile.value.id))
+    .build();
+  
+  const result = await CampsitesService.searchCampsites(query);
+  if (result.data) {
+    userCampsites.value = result.data;
+  }
+}
+
 onMounted(async function() {
   const result = await UsersService.getCurrentUser();
   if (result.data) {
     userProfile.value = result.data;
     syncRequest(editRequest, result.data);
+    await fetchUserCampsites();
   }
 });
 
 async function handleUserDelete() {
-  const result = await UsersService.deleteCurrentUser();
-  AuthenticationService.logout();
+  if (confirm("Are you sure? This cannot be undone.")) {
+    deleting.value = true;
+    await UsersService.deleteCurrentUser();
+    AuthenticationService.logout();
+    router.push('/');
+  }
 }
 
+function selectCampsite(camp: CampsiteProfile) {
+  router.push(`/app/campsites/${encodeURIComponent(camp.name)}`);
+}
 
 function handleFileChange(event: Event) {
   const target = event.target as HTMLInputElement;

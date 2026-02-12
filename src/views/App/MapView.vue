@@ -1,18 +1,14 @@
 <template>
-  <div class="h-full w-full relative"> <MapboxMap
+  <div class="h-full w-full relative"> 
+    <MapboxMap
       v-if="mapboxToken"
       :access-token="mapboxToken"
       @search="$router.push('/app/search')"
       @location-found="handleLocationFound"
+      @campsite-created="handleNewCampsite"
     />
     
-    <div v-else class="absolute inset-0 flex items-center justify-center bg-gray-100">
-      <div class="text-center">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
-        <p class="text-gray-600">Loading map...</p>
-      </div>
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -27,5 +23,9 @@ onMounted(() => {
 
 const handleLocationFound = (lat: number, lng: number) => {
   console.log('Map focus:', lat, lng)
+}
+
+const handleNewCampsite = (campsite: any) => {
+  console.log('New campsite saved:', campsite)
 }
 </script>

@@ -1,168 +1,322 @@
 <template>
-  <div ref="mapContainer" class="map-container">
-    <!-- Controls -->
-    <div class="absolute top-4 left-4 flex flex-col space-y-2 z-10">      
+  <div ref="mapContainer" class="map-container" :class="{ 'is-adding': isCreationMode }">
+    <div class="absolute top-6 left-6 flex flex-col gap-3 z-10">      
+      <button @click="toggleLayer" class="control-btn" :title="showSatellite ? 'Topographical' : 'Satellite'">
+        <span>{{ showSatellite ? '🌲' : '🛰️' }}</span>
+      </button>
+
       <button 
-        @click="toggleLayer"
-        class="p-3 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition"
-        :title="showSatellite ? 'Switch to topographical' : 'Switch to satellite'"
+        @click="toggleCreationMode"
+        class="control-btn"
+        :class="{ 'active-mode': isCreationMode }"
+        title="Add a new campsite"
       >
-        <span class="text-xl">{{ showSatellite ? '🌲' : '🛰️' }}</span>
+        <span v-if="!isCreationMode">📍</span>
+        <span v-else>✕</span>
       </button>
     </div>
+
+    <div v-if="isCreationMode && !tempCoords" class="absolute top-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+      <div class="px-4 py-2 rounded-full bg-black/70 text-white text-sm backdrop-blur-md border border-white/20">
+        Tap the map to drop a pin
+      </div>
+    </div>
+
+    <transition name="pop">
+      <div v-if="tempCoords" class="creation-overlay">
+        <div class="creation-card">
+          <div class="card-header">
+            <div>
+              <h3 class="text-lg font-bold">Discover New Spot</h3>
+              <p class="text-xs opacity-60">Fine-tune location by dragging the pin</p>
+            </div>
+          </div>
+          
+          <div class="p-5 space-y-4">
+            <div class="input-group">
+              <label>Campsite Name</label>
+              <input v-model="newCamp.Name" placeholder="e.g. Hidden Creek Peak" />
+            </div>
+            
+            <div class="input-group">
+              <label>Description</label>
+              <textarea v-model="newCamp.Description" placeholder="What makes this spot special?" rows="2"></textarea>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+              <button @click="cancelCreation" class="btn-secondary">Cancel</button>
+              <button 
+                @click="submitCampsite" 
+                :disabled="!newCamp.Name || isSubmitting"
+                class="btn-primary"
+              >
+                {{ isSubmitting ? 'Saving...' : 'Drop Pin' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, nextTick, shallowRef } from 'vue'
+import { useRouter } from 'vue-router'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import { CampsitesService } from '@/services/CampsitesService'
+import type { CampsiteProfile } from '@/api'
 
-const props = defineProps<{
-  accessToken: string
-}>()
-
+const props = defineProps<{ accessToken: string }>()
 const emit = defineEmits<{
-  search: []
-  locationFound: [lat: number, lng: number]
+  locationFound: [lat: number, lng: number],
+  campsiteCreated: [campsite: CampsiteProfile]
 }>()
 
+const router = useRouter()
 const mapContainer = ref<HTMLElement>()
-const map = ref<mapboxgl.Map>()
+const map = shallowRef<mapboxgl.Map>()
 const showSatellite = ref(false)
+
+// Marker Management
+const campsiteMarkers = shallowRef<mapboxgl.Marker[]>([])
+const tempMarker = shallowRef<mapboxgl.Marker | null>(null)
+
+// Creation State
+const isCreationMode = ref(false)
+const isSubmitting = ref(false)
+const tempCoords = ref<{ lat: number, lng: number } | null>(null)
+const newCamp = reactive({ Name: '', Description: '' })
 
 onMounted(async () => {
   await nextTick()
+  if (!mapContainer.value || !props.accessToken) return
   
-  if (!mapContainer.value || !props.accessToken) {
-    console.error('Missing container or token')
-    return
-  }
-  
-  // CRITICAL: Set explicit dimensions on the container
-  const container = mapContainer.value
-  container.style.width = '100%'
-  container.style.height = '100%'
-  container.style.position = 'absolute'
-  container.style.top = '0'
-  container.style.left = '0'
-  
-  // Set token
   mapboxgl.accessToken = props.accessToken
-  
-  // Initialize map
   map.value = new mapboxgl.Map({
-    container: container,
+    container: mapContainer.value,
     style: 'mapbox://styles/mapbox/outdoors-v12',
     center: [-98.5795, 39.8283],
+    projection: {name: 'mercator'},
     zoom: 3,
-    projection: { name: 'mercator' },
     attributionControl: false
   })
-  
-  // Add controls after load
+
   map.value.on('load', () => {
-    console.log('Map loaded successfully')
-    
-    // Navigation controls
-    map.value?.addControl(new mapboxgl.NavigationControl(), 'top-right')
-    
-    // Geolocation control
-    const geolocate = new mapboxgl.GeolocateControl({
-      positionOptions: { enableHighAccuracy: true },
-      trackUserLocation: true,
-      showUserLocation: true
-    })
-    map.value?.addControl(geolocate, 'top-right')
-    
-    geolocate.on('geolocate', (e: any) => {
-      emit('locationFound', e.coords.latitude, e.coords.longitude)
-    })
-    
-    // Attribution
-    map.value?.addControl(new mapboxgl.AttributionControl({ compact: true }))
-    
-    // Force resize after load
-    setTimeout(() => {
-      map.value?.resize()
-    }, 100)
+    // 1. Initial Load of all campsites
+    refreshCampsites()
   })
-  
-  // Handle errors
-  map.value.on('error', (e) => {
-    console.error('Map error:', e.error)
+
+  map.value.on('click', (e) => {
+    if (!isCreationMode.value) return
+    handleMapClick(e.lngLat.lng, e.lngLat.lat)
   })
 })
 
-const locateUser = () => {
-  if (!navigator.geolocation) {
-    alert('Geolocation not supported')
-    return
-  }
-  
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const { latitude, longitude } = position.coords
+/**
+ * Fetches all campsites from the API and renders them as markers
+ */
+const refreshCampsites = async () => {
+  if (!map.value) return
+
+  const result = await CampsitesService.searchCampsites()
+  if (!result.data) return
+
+  // Clear existing markers from map
+  campsiteMarkers.value.forEach(m => m.remove())
+  campsiteMarkers.value = []
+
+  // Add new markers
+  // ... inside refreshCampsites loop ...
+  result.data.forEach((camp: CampsiteProfile) => {
+    // Check for both casing styles just to be safe
+    const lat = camp.latitude ?? camp.latitude
+    const lng = camp.longitude ?? camp.longitude
+
+    if (lat && lng) {
+      // 1. Create the Wrapper (Mapbox controls this)
+      const wrapper = document.createElement('div')
+      wrapper.className = 'marker-wrapper'
+
+      // 2. Create the Inner Content (We control this)
+      const content = document.createElement('div')
+      content.className = 'campsite-marker'
+      content.innerHTML = '⛺'
       
-      if (map.value) {
-        map.value.flyTo({
-          center: [longitude, latitude],
-          zoom: 14
-        })
-        
-        // Add marker
-        new mapboxgl.Marker({
-          color: '#ea580c'
-        })
-          .setLngLat([longitude, latitude])
-          .addTo(map.value)
-        
-        emit('locationFound', latitude, longitude)
-      }
-    },
-    (error) => {
-      alert('Location error: ' + error.message)
+      // Append content to wrapper
+      wrapper.appendChild(content)
+
+      // 3. Create Marker passing the WRAPPER
+      const marker = new mapboxgl.Marker({ element: wrapper })
+        .setLngLat([lng, lat])
+        .addTo(map.value!)
+
+      // 4. Click event goes on the wrapper or content
+      wrapper.addEventListener('click', (e) => {
+        e.stopPropagation()
+        router.push(`/app/campsites/${encodeURIComponent(camp.name || camp.name)}`)
+      })
+
+      campsiteMarkers.value.push(marker)
     }
-  )
+  })
+}
+
+const toggleCreationMode = () => {
+  isCreationMode.value = !isCreationMode.value
+  if (!isCreationMode.value) cancelCreation()
+}
+
+const handleMapClick = (lng: number, lat: number) => {
+  if (tempMarker.value) tempMarker.value.remove()
+  tempCoords.value = { lat, lng }
+  
+  const el = document.createElement('div')
+  el.className = 'custom-tent-marker active-pin'
+  el.innerHTML = '⛺'
+
+  tempMarker.value = new mapboxgl.Marker({ element: el, draggable: true })
+    .setLngLat([lng, lat])
+    .addTo(map.value!)
+}
+
+const submitCampsite = async () => {
+  if (!tempCoords.value || !newCamp.Name || isSubmitting.value) return
+  isSubmitting.value = true
+  try {
+    const res = await CampsitesService.createCampsite({
+      Name: newCamp.Name,
+      Description: newCamp.Description,
+      Latitude: tempCoords.value.lat,
+      Longitude: tempCoords.value.lng
+    })
+    if (res.data) {
+      emit('campsiteCreated', res.data)
+      cancelCreation()
+      refreshCampsites() // 2. Refresh the map so the new spot appears for everyone
+    }
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+const cancelCreation = () => {
+  isCreationMode.value = false
+  tempCoords.value = null
+  newCamp.Name = ''; newCamp.Description = ''
+  if (tempMarker.value) { tempMarker.value.remove(); tempMarker.value = null }
 }
 
 const toggleLayer = () => {
   if (!map.value) return
-  
   showSatellite.value = !showSatellite.value
+  map.value.setStyle(showSatellite.value ? 'mapbox://styles/mapbox/satellite-streets-v12' : 'mapbox://styles/mapbox/outdoors-v12')
   
-  if (showSatellite.value) {
-    // Satellite Streets is great for campers to see actual tree cover
-    map.value.setStyle('mapbox://styles/mapbox/satellite-streets-v12')
-  } else {
-    // Outdoors is the gold standard for your base map
-    map.value.setStyle('mapbox://styles/mapbox/outdoors-v12')
-  }
+  // Changing style removes all markers, so we re-add them after the style loads
+  map.value.once('style.load', () => refreshCampsites())
 }
 
-onUnmounted(() => {
-  map.value?.remove()
-})
+onUnmounted(() => map.value?.remove())
 </script>
 
 <style scoped>
-/* CRITICAL: These styles ensure the map container has dimensions */
 .map-container {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
+  background-color: var(--surface);
 }
 
-/* Ensure Mapbox canvas fills container */
-.mapboxgl-canvas {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
+.is-adding { cursor: crosshair !important; }
+
+/* Control Buttons */
+.control-btn {
+  width: 48px;
+  height: 48px;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
 }
+.control-btn:hover { transform: translateY(-2px); border-color: var(--accent); }
+.active-mode { background-color: var(--accent) !important; color: white !important; }
+
+:deep(.marker-wrapper) {
+  cursor: pointer;
+  /* Optional: keeps the click target size reasonable */
+  width: 30px; 
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inner content that we can animate freely */
+:deep(.campsite-marker) {
+  font-size: 1.5rem;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* That fun bounce */
+  will-change: transform;
+}
+
+/* Hover effect targets the child when wrapper is hovered */
+:deep(.marker-wrapper:hover .campsite-marker) {
+  transform: scale(1.5) translateY(-5px);
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+}
+
+/* New Pin Dragging Marker */
+:deep(.custom-tent-marker.active-pin) {
+  font-size: 2.5rem;
+  cursor: grab;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));
+}
+
+.creation-overlay {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 400px;
+  z-index: 20;
+}
+
+.creation-card {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 16px 24px;
+  background: linear-gradient(to bottom, var(--surface), var(--card-bg));
+  border-bottom: 1px solid var(--border);
+}
+
+.input-group { display: flex; flex-direction: column; gap: 4px; }
+.input-group label { font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+.input-group input, .input-group textarea {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-color);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 0.95rem;
+}
+
+.btn-primary { flex: 2; background: var(--accent); color: white; border-radius: 12px; font-weight: 700; padding: 14px; }
+.btn-secondary { flex: 1; color: var(--muted); font-weight: 600; }
+
+.pop-enter-active, .pop-leave-active { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.pop-enter-from, .pop-leave-to { opacity: 0; transform: translate(-50%, 100px); }
 </style>

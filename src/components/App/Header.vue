@@ -74,7 +74,6 @@
           {{ isDark ? '☀️' : '🌙' }}
         </button>
         <button @click="toggleProfile" class="p-2" style="color: var(--header-text);">👤</button>
-        <button @click="toggleSettings" class="p-2" style="color: var(--header-text);">⚙️</button>
       </div>
     </div>
   </div>

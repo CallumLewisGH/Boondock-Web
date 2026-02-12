@@ -25,7 +25,7 @@
     
     <div class="grid grid-cols-2 gap-4 mb-8">
       <div class="p-4 rounded-xl shadow-sm text-center border" style="background-color: var(--card-bg); border-color: var(--border);">
-        <div class="text-2xl font-bold" style="color: var(--accent);">0</div>
+        <div class="text-2xl font-bold" style="color: var(--accent);">{{ userCampsites?.length || 0 }}</div>
         <div class="text-sm" style="color: var(--muted);">Campsites Found</div>
       </div>
       <div class="p-4 rounded-xl shadow-sm text-center border" style="background-color: var(--card-bg); border-color: var(--border);">
@@ -47,13 +47,40 @@
       </div>
     </div>
 
-    <div v-if="activeTab === 'campsites'" class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
-         style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
-      {{ userProfile.username }} hasn't posted any campsites yet.
-    </div>
-    <div v-else-if="activeTab === 'reviews'" class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
-         style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
-      No reviews yet.
+    <div class="min-h-[200px]">
+      <div v-if="activeTab === 'campsites'">
+        <div v-if="userCampsites && userCampsites.length > 0" class="grid gap-4">
+          <div 
+            v-for="camp in userCampsites" 
+            :key="camp.id" 
+            @click="selectCampsite(camp)"
+            class="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:scale-[1.01] transition-all"
+            style="background-color: var(--card-bg); border-color: var(--border);"
+          >
+            <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" style="background-color: var(--surface);">
+              ⛺
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-bold truncate" style="color: var(--text-color);">{{ camp.name }}</h3>
+              <p class="text-sm truncate" style="color: var(--muted);">{{ camp.description || 'No description provided.' }}</p>
+            </div>
+            <div class="text-accent">
+              <span class="text-xl">›</span>
+            </div>
+          </div>
+        </div>
+        <div v-else class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
+             style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
+          {{ userProfile.username }} hasn't posted any campsites yet.
+        </div>
+      </div>
+
+      <div v-else-if="activeTab === 'reviews'">
+        <div class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
+             style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
+          No reviews yet.
+        </div>
+      </div>
     </div>
   </div>
 
@@ -72,11 +99,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { UserPublicProfile } from '@/api'
+import type { CampsiteProfile, UserPublicProfile } from '@/api'
 import { formatBase64 } from '@/helpers/base64'
 import { UsersService } from '@/services/UsersService'
 import { QueryBuilder } from '@/helpers/queryBuilder'
 import { UserQueryFilters } from '@/queryFilters/userQueryFilters'
+import { CampsitesService } from '@/services/CampsitesService'
+import { CampsiteQueryFilters } from '@/queryFilters/campsiteQueryFilters'
 
 const route = useRoute()
 const router = useRouter()
@@ -88,19 +117,30 @@ const publicTabs = [
 
 const activeTab = ref('campsites')
 const userProfile = ref<UserPublicProfile | null>(null)
+const userCampsites = ref<CampsiteProfile[]>([])
 const loading = ref(true)
 
-async function fetchUser() {
-  // Use 'name' because your route is defined as /users/:name
-  const username = route.params.name as string
+async function fetchCampsites() {
+  if (!userProfile.value) return
   
+  const query = new QueryBuilder()
+    .addParameter(CampsiteQueryFilters.WithOwnerId(userProfile.value.id))
+    .build()
+
+  const result = await CampsitesService.searchCampsites(query)
+  if (result.data) {
+    userCampsites.value = result.data
+  }
+}
+
+async function fetchUser() {
+  const username = route.params.name as string
   if (!username) {
     loading.value = false
     return
   }
 
   loading.value = true
-
   try {
     const query = new QueryBuilder()
       .addParameter(UserQueryFilters.WithUsernames([username]))
@@ -110,14 +150,13 @@ async function fetchUser() {
 
     if (result.data && result.data.length > 0) {
       if (!result.data[0]) {
-        console.error("❌ User not found in DB");
-        // router.push('/'); 
         return;
-      };
-      userProfile.value = result.data[0];
+      }
+      userProfile.value = result.data[0]
+      // Fetch campsites once we have the user ID
+      await fetchCampsites()
     } else {
       userProfile.value = null
-      console.warn(`No user found with username: ${username}`)
     }
   } catch (err) {
     userProfile.value = null
@@ -127,7 +166,10 @@ async function fetchUser() {
   }
 }
 
-// Watch 'name' param for changes to allow searching while already on a profile page
+function selectCampsite(campsiteItem: CampsiteProfile) {
+  router.push(`/app/campsites/${encodeURIComponent(campsiteItem.name)}`)
+}
+
 watch(() => route.params.name, () => {
   fetchUser()
 })
