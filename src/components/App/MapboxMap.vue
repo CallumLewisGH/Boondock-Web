@@ -1,6 +1,15 @@
 <template>
   <div ref="mapContainer" class="map-container" :class="{ 'is-adding': isCreationMode }">
-    <div class="absolute top-6 left-6 flex flex-col gap-3 z-10">      
+    <CampsiteSidebar 
+      :is-open="sidebarOpen"
+      :campsite-id="selectedCampsiteId"
+      @close="closeSidebar"
+      @toggle="toggleSidebar"
+      @updated="handleCampsiteUpdated"
+      @deleted="handleCampsiteDeleted"
+    />
+
+    <div class="absolute top-6 right-6 flex flex-col gap-3 z-10">      
   <button @click="toggleLayer" class="control-btn" :title="showSatellite ? 'Topographical' : 'Satellite'">
     <span>{{ showSatellite ? '🌲' : '🛰️' }}</span>
   </button>
@@ -70,9 +79,9 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, nextTick, shallowRef } from 'vue'
-import { useRouter } from 'vue-router'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import CampsiteSidebar from './CampsiteSidebar.vue'
 import { CampsitesService } from '@/services/CampsitesService'
 import type { CampsiteProfile } from '@/api'
 
@@ -82,10 +91,13 @@ const emit = defineEmits<{
   campsiteCreated: [campsite: CampsiteProfile]
 }>()
 
-const router = useRouter()
 const mapContainer = ref<HTMLElement>()
 const map = shallowRef<mapboxgl.Map>()
 const showSatellite = ref(false)
+
+// Sidebar state
+const sidebarOpen = ref(false)
+const selectedCampsiteId = ref<string | null>(null)
 
 // Marker Management
 const campsiteMarkers = shallowRef<mapboxgl.Marker[]>([])
@@ -163,7 +175,8 @@ const refreshCampsites = async () => {
       // 4. Click event goes on the wrapper or content
       wrapper.addEventListener('click', (e) => {
         e.stopPropagation()
-        router.push(`/app/campsites/${encodeURIComponent(camp.name || camp.name)}`)
+        selectedCampsiteId.value = camp.id || camp.name || ''
+        sidebarOpen.value = true
       })
 
       campsiteMarkers.value.push(marker)
@@ -267,8 +280,24 @@ const resetNorth = () => {
   })
 }
 
+const closeSidebar = () => {
+  sidebarOpen.value = false
+  selectedCampsiteId.value = null
+}
 
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value
+}
 
+const handleCampsiteUpdated = (campsite: CampsiteProfile) => {
+  // Optionally refresh markers if needed
+  refreshCampsites()
+}
+
+const handleCampsiteDeleted = () => {
+  closeSidebar()
+  refreshCampsites()
+}
 
 onUnmounted(() => map.value?.remove())
 </script>
