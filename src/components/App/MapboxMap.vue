@@ -1,20 +1,28 @@
 <template>
   <div ref="mapContainer" class="map-container" :class="{ 'is-adding': isCreationMode }">
     <div class="absolute top-6 left-6 flex flex-col gap-3 z-10">      
-      <button @click="toggleLayer" class="control-btn" :title="showSatellite ? 'Topographical' : 'Satellite'">
-        <span>{{ showSatellite ? '🌲' : '🛰️' }}</span>
-      </button>
+  <button @click="toggleLayer" class="control-btn" :title="showSatellite ? 'Topographical' : 'Satellite'">
+    <span>{{ showSatellite ? '🌲' : '🛰️' }}</span>
+  </button>
 
-      <button 
-        @click="toggleCreationMode"
-        class="control-btn"
-        :class="{ 'active-mode': isCreationMode }"
-        title="Add a new campsite"
-      >
-        <span v-if="!isCreationMode">📍</span>
-        <span v-else>✕</span>
-      </button>
-    </div>
+  <button @click="locateUser" class="control-btn" title="Find my location">
+    <span>🎯</span>
+  </button>
+
+  <button @click="resetNorth" class="control-btn" title="Reset North">
+    <span :style="{ transform: `rotate(${mapBearing}deg)`, display: 'inline-block' }">🧭</span>
+  </button>
+
+  <button 
+    @click="toggleCreationMode"
+    class="control-btn"
+    :class="{ 'active-mode': isCreationMode }"
+    title="Add a new campsite"
+  >
+    <span v-if="!isCreationMode">⛺</span>
+    <span v-else>✕</span>
+  </button>
+</div>
 
     <div v-if="isCreationMode && !tempCoords" class="absolute top-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
       <div class="px-4 py-2 rounded-full bg-black/70 text-white text-sm backdrop-blur-md border border-white/20">
@@ -216,6 +224,51 @@ const toggleLayer = () => {
   // Changing style removes all markers, so we re-add them after the style loads
   map.value.once('style.load', () => refreshCampsites())
 }
+
+const mapBearing = ref(0)
+
+// Inside onMounted, after initializing map.value:
+map.value?.on('rotate', () => {
+  // Update our ref so the UI icon rotates with the map
+  mapBearing.value = map.value ? -map.value.getBearing() : 0
+})
+
+/**
+ * Uses the browser Geolocation API to fly to the user
+ */
+const locateUser = () => {
+  if (!map.value) return
+  
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      map.value?.flyTo({
+        center: [pos.coords.longitude, pos.coords.latitude],
+        zoom: 14,
+        essential: true
+      })
+    },
+    (err) => {
+      console.error("Locate failed:", err)
+      alert("Could not find your location. Please check your browser permissions.")
+    },
+    { enableHighAccuracy: true }
+  )
+}
+
+/**
+ * Resets map rotation to North (0 degrees)
+ */
+const resetNorth = () => {
+  if (!map.value) return
+  map.value.easeTo({
+    bearing: 0,
+    pitch: 0, // Optional: flattens the map if you were in 3D mode
+    duration: 1000
+  })
+}
+
+
+
 
 onUnmounted(() => map.value?.remove())
 </script>
