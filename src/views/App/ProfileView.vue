@@ -1,202 +1,231 @@
 <template>
-  <div v-if="userProfile" class="max-w-4xl mx-auto p-6 min-h-screen" style="color: var(--text-color);">
-    <div class="flex items-center gap-6 mb-8">
-      <div class="relative">
-        <div v-if="userProfile.profilePicture" 
-             class="w-24 h-24 rounded-full overflow-hidden border-2" 
-             style="border-color: var(--border);">
-          <img 
-            :src="formatBase64(userProfile.profilePicture)" 
-            alt="Profile Picture" 
-            class="w-full h-full object-cover" 
-          />
+  <div v-if="userProfile" class="max-w-4xl mx-auto p-6 min-h-screen">
+    <!-- Profile Header with Picture Edit -->
+    <div class="relative mb-8">
+      <button 
+        @click="fileInput?.click()"
+        class="absolute -top-2 -right-2 p-2 rounded-full shadow-lg hover:opacity-90 transition-opacity z-10"
+        style="background-color: var(--accent); color: var(--header-text);"
+      >
+        ✏️
+      </button>
+      <input 
+        type="file" 
+        ref="fileInput" 
+        class="hidden" 
+        accept="image/*" 
+        @change="handleFileChange"
+      />
+      <ProfileHeader :profile="userProfile" />
+    </div>
+    
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div class="p-4 rounded-xl text-center border" 
+           :style="{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border)' }">
+        <div class="text-2xl font-bold" :style="{ color: 'var(--accent)' }">{{ userCampsites.length }}</div>
+        <div class="text-sm" :style="{ color: 'var(--muted)' }">Campsites Found</div>
+      </div>
+      <div class="p-4 rounded-xl text-center border" 
+           :style="{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border)' }">
+        <div class="text-2xl font-bold" :style="{ color: 'var(--accent)' }">0</div>
+        <div class="text-sm" :style="{ color: 'var(--muted)' }">Reviews Made</div>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <TabNavigation 
+      :tabs="tabs" 
+      :active-tab="activeTab"
+      @select="activeTab = $event"
+    />
+    
+    <!-- Tab Content -->
+    <div class="mt-6">
+      <!-- Campsites Tab -->
+      <div v-if="activeTab === 'campsites'">
+        <div v-if="userCampsites.length > 0" class="grid gap-4">
+          <Card 
+            v-for="camp in userCampsites" 
+            :key="camp.id"
+            @click="selectCampsite(camp)"
+          >
+            <template #icon>
+              <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" :style="{ backgroundColor: 'var(--surface)' }">
+                ⛺
+              </div>
+            </template>
+            <template #title>{{ camp.name }}</template>
+            <template #description>{{ camp.description || 'No description provided.' }}</template>
+            <template #action>
+              <div class="flex items-center gap-2">
+                <button
+                  @click.stop="selectCampsite(camp)"
+                  class="text-sm font-semibold"
+                  :style="{ color: 'var(--accent)' }"
+                >
+                  ›
+                </button>
+              </div>
+            </template>
+          </Card>
         </div>
-        <div v-else 
-             class="w-24 h-24 rounded-full flex items-center justify-center text-3xl border-2" 
-             style="background-color: var(--surface); border-color: var(--border);">
-          👤
-        </div>
-        <button 
-          @click="fileInput?.click()"
-          class="absolute bottom-0 right-0 p-2 rounded-full shadow-lg hover:opacity-90 transition-opacity"
-          style="background-color: var(--accent); color: var(--header-text);"
-        >
-          ✏️
-        </button>
-        <input 
-          type="file" 
-          ref="fileInput" 
-          class="hidden" 
-          accept="image/*" 
-          @change="handleFileChange"
+        <EmptyState 
+          v-else
+          icon="⛺"
+          title="No Campsites Yet"
+          message="You haven't posted any campsites yet. Start by creating one!"
         />
       </div>
-      <div class="flex-1">
-        <h1 class="text-3xl font-bold">{{ userProfile.username }}</h1>
-        <p v-if="!userProfile.bio" style="color: var(--muted);">{{ userProfile.email }}</p>
-        <p v-if="userProfile.bio" class="text-sm mt-1 italic" style="color: var(--muted);">
-          "{{ userProfile.bio }}"
-        </p>
-      </div>
-    </div>
-    
-    <div class="grid grid-cols-2 gap-4 mb-8">
-      <div class="p-4 rounded-xl shadow-sm text-center border" 
-           style="background-color: var(--card-bg); border-color: var(--border);">
-        <div class="text-2xl font-bold" style="color: var(--accent);">{{ userCampsites.length }}</div>
-        <div class="text-sm" style="color: var(--muted);">Campsites Found</div>
-      </div>
-      <div class="p-4 rounded-xl shadow-sm text-center border" 
-           style="background-color: var(--card-bg); border-color: var(--border);">
-        <div class="text-2xl font-bold" style="color: var(--accent);">0</div>
-        <div class="text-sm" style="color: var(--muted);">Reviews Made</div>
-      </div>
-    </div>
 
-    <div class="border-b mb-6" style="border-color: var(--border);">
-      <div class="flex space-x-4">
-        <button 
-          v-for="tab in tabs" :key="tab.id"
-          @click="activeTab = tab.id"
-          :class="['px-4 py-2 font-medium transition-all border-b-2']"
-          :style="{
-            borderColor: activeTab === tab.id ? 'var(--accent)' : 'transparent',
-            color: activeTab === tab.id ? 'var(--accent)' : 'var(--muted)'
-          }"
-        >
-          {{ tab.label }}
-        </button>
+      <!-- Reviews Tab -->
+      <div v-else-if="activeTab === 'reviews'">
+        <EmptyState 
+          icon=""
+          title="No Reviews Yet"
+          message="You haven't made any reviews yet. Share your experience!"
+        />
       </div>
-    </div>
-    
-    <div v-if="activeTab === 'campsites'">
-      <div v-if="userCampsites.length > 0" class="grid gap-4">
-        <div 
-          v-for="camp in userCampsites" 
-          :key="camp.id" 
-          @click="selectCampsite(camp)"
-          class="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:scale-[1.01] transition-all overflow-hidden"
-          style="background-color: var(--card-bg); border-color: var(--border);"
-        >
-          <div class="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-2xl" style="background-color: var(--surface);">
-            ⛺
+
+      <!-- Edit Profile Tab -->
+      <div v-else-if="activeTab === 'edit'">
+        <div class="p-6 rounded-xl border" 
+             :style="{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border)' }">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="font-bold text-lg" :style="{ color: 'var(--text-color)' }">Edit Profile</h3>
+            <Button 
+              label="Delete User"
+              variant="danger"
+              :disabled="deleting"
+              @click="handleUserDelete"
+            />
           </div>
 
-          <div class="flex-1 min-w-0">
-            <h3 class="font-bold truncate text-lg" style="color: var(--text-color);">
-              {{ camp.name }}
-            </h3>
+          <form @submit.prevent="handleSaveProfile" class="space-y-4">
+            <TextInput 
+              :model-value="editRequest.username || ''"
+              label="Username"
+              placeholder="Enter your username"
+              required
+              @update:model-value="editRequest.username = $event"
+            />
+
+            <TextInput 
+              type="email"
+              :model-value="editRequest.email || ''"
+              label="Email"
+              placeholder="Enter your email"
+              required
+              @update:model-value="editRequest.email = $event"
+            />
+
+            <CountedTextArea 
+              :model-value="editRequest.bio || ''"
+              label="Bio"
+              placeholder="Tell us about yourself"
+              :max-length="500"
+              :show-count="true"
+              :rows="3"
+              @update:model-value="editRequest.bio = $event"
+            />
             
-            <p 
-              class="text-sm break-words line-clamp-2 whitespace-normal" 
-              style="color: var(--muted); display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;"
-            >
-              {{ camp.description || 'No description provided.' }}
-            </p>
-          </div>
-
-          <div class="flex-shrink-0 ml-2" style="color: var(--accent);">
-            <span class="text-xl">›</span>
-          </div>
+            <div class="pt-4 flex gap-3">
+              <Button 
+                label="Save Changes"
+                type="submit"
+                variant="primary"
+                :disabled="isSaving || !hasChanges"
+              />
+              <Button 
+                label="Cancel"
+                variant="secondary"
+                @click="resetEdit"
+              />
+            </div>
+          </form>
         </div>
-      </div>
-      <div v-else class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
-           style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
-        You haven't posted any campsites yet.
-      </div>
-    </div>
-
-    <div v-else-if="activeTab === 'reviews'" 
-         class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
-         style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
-      No reviews yet.
-    </div>
-    
-    <div v-else-if="activeTab === 'edit'" class="space-y-4">
-      <div class="p-6 rounded-xl shadow-md border" 
-           style="background-color: var(--card-bg); border-color: var(--border);">
-        <div class="flex items-center justify-between mb-6">
-        <h3 class="font-bold mb-4 text-lg">Edit Profile</h3>
-        <button @click="handleUserDelete" 
-                  class="text-xs font-bold uppercase text-red-500 hover:opacity-70 transition-opacity"
-                  :disabled="deleting">
-            {{ deleting ? 'Deleting...' : 'Delete User' }}
-          </button>
-        </div>
-        <form @submit.prevent="handleSaveProfile" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-1">Username</label>
-            <input 
-              type="text" 
-              v-model="editRequest.username"
-              class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2"
-              style="background-color: var(--surface); border-color: var(--border); color: var(--text-color); --tw-ring-color: var(--accent);"
-            >
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Email</label>
-            <input 
-              type="email" 
-              v-model="editRequest.email"
-              class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2"
-              style="background-color: var(--surface); border-color: var(--border); color: var(--text-color); --tw-ring-color: var(--accent);"
-            >
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Bio</label>
-            <textarea 
-              v-model="editRequest.bio"
-              rows="3"
-              class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2"
-              style="background-color: var(--surface); border-color: var(--border); color: var(--text-color); --tw-ring-color: var(--accent);"
-            ></textarea>
-          </div>
-          
-          <div class="pt-2">
-            <button 
-              type="submit"
-              :disabled="isSaving || !hasChanges"
-              class="px-6 py-2 rounded-lg font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              style="background-color: var(--accent); color: var(--header-text);"
-            >
-              {{ isSaving ? 'Saving...' : 'Save Changes' }}
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   </div>
 
   <div v-else class="flex justify-center items-center min-h-[400px]">
-    <div class="animate-spin rounded-full h-12 w-12 border-b-2" style="border-color: var(--accent);"></div>
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2" :style="{ borderColor: 'var(--accent)' }"></div>
   </div>
+
+  <!-- Error Modal -->
+  <Modal :is-open="showErrorModal" title="Update Failed" @close="showErrorModal = false">
+    <p class="text-sm whitespace-pre-wrap" :style="{ color: 'var(--text-color)' }">
+      {{ errorMessage }}
+    </p>
+    <template #footer>
+      <Button
+        label="Close"
+        variant="primary"
+        @click="showErrorModal = false"
+      />
+    </template>
+  </Modal>
+
+  <!-- Confirm Delete User Modal -->
+  <ConfirmDeleteModal
+    :is-open="showDeleteModal"
+    title="Delete Account"
+    message="Are you sure you want to delete your account? This action cannot be undone."
+    :is-deleting="deleting"
+    @confirm="confirmDeleteUser"
+    @close="showDeleteModal = false"
+  />
+
+  <ConfirmDeleteModal
+    :is-open="showCampsiteDeleteModal"
+    title="Delete Campsite"
+    message="Are you sure you want to delete this campsite? This action cannot be undone."
+    :is-deleting="deletingCampsite"
+    @confirm="confirmDeleteCampsite"
+    @close="showCampsiteDeleteModal = false"
+  />
 </template>
 
 <script setup lang="ts">
-import type { UpdateUserRequest, UserPrivateProfile, CampsiteProfile } from '@/api';
-import { formatBase64 } from '@/helpers/base64';
-import { getDirtyFields, hasChanged, syncRequest } from '@/helpers/diff';
-import { useRouter } from 'vue-router';
-import { AuthenticationService } from '@/services/AuthenticationService';
-import { UsersService } from '@/services/UsersService';
-import { CampsitesService } from '@/services/CampsitesService';
-import { QueryBuilder } from '@/helpers/queryBuilder';
-import { CampsiteQueryFilters } from '@/queryFilters/campsiteQueryFilters';
+import type { UpdateUserRequest, UserPrivateProfile, CampsiteProfile } from '@/api'
+import { formatBase64 } from '@/helpers/base64'
+import { getDirtyFields, hasChanged, syncRequest } from '@/helpers/diff'
+import { useRouter } from 'vue-router'
+import { AuthenticationService } from '@/services/AuthenticationService'
+import { UsersService } from '@/services/UsersService'
+import { CampsitesService } from '@/services/CampsitesService'
+import { QueryBuilder } from '@/helpers/queryBuilder'
+import { CampsiteQueryFilters } from '@/queryFilters/campsiteQueryFilters'
 import { ref, reactive, onMounted, computed } from 'vue'
+import { Modal, Button } from '@/components'
+import ConfirmDeleteModal from '@/components/ui/ConfirmDeleteModal.vue'
+import ProfileHeader from '@/components/common/ProfileHeader.vue'
+import TabNavigation from '@/components/common/TabNavigation.vue'
+import Card from '@/components/common/Card.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
+import TextInput from '@/components/ui/TextInput.vue'
+import CountedTextArea from '@/components/common/CountedTextArea.vue'
 
-const router = useRouter();
+const router = useRouter()
+
 const tabs = [
   { id: 'campsites', label: 'My Campsites' },
   { id: 'reviews', label: 'Reviews' },
   { id: 'edit', label: 'Edit Profile' }
 ]
 
-const deleting = ref<boolean>(false);
-const activeTab = ref('campsites');
-const userProfile = ref<UserPrivateProfile | null>(null);
-const userCampsites = ref<CampsiteProfile[]>([]);
-const isSaving = ref(false);
-const fileInput = ref<HTMLInputElement | null>(null);
+const deleting = ref(false)
+const showDeleteModal = ref(false)
+const activeTab = ref<string | number>('campsites')
+const userProfile = ref<UserPrivateProfile | null>(null)
+const userCampsites = ref<CampsiteProfile[]>([])
+const deletingCampsite = ref(false)
+const campsiteToDelete = ref<string | null>(null)
+const showCampsiteDeleteModal = ref(false)
+const isSaving = ref(false)
+const fileInput = ref<HTMLInputElement | null>(null)
+const showErrorModal = ref(false)
+const errorMessage = ref('')
 
 const editRequest = reactive<UpdateUserRequest>({
   username: undefined,
@@ -204,76 +233,112 @@ const editRequest = reactive<UpdateUserRequest>({
   email: undefined,
   profilePicture: undefined,
   timezone: undefined
-});
+})
 
-const hasChanges = computed(function() {
-  if (!userProfile.value) return false;
-  return hasChanged(userProfile.value, editRequest);
-});
+const hasChanges = computed(() => {
+  if (!userProfile.value) return false
+  return hasChanged(userProfile.value, editRequest)
+})
 
 async function fetchUserCampsites() {
-  if (!userProfile.value) return;
+  if (!userProfile.value) return
   const query = new QueryBuilder()
     .addParameter(CampsiteQueryFilters.WithOwnerId(userProfile.value.id))
-    .build();
+    .build()
   
-  const result = await CampsitesService.searchCampsites(query);
+  const result = await CampsitesService.searchCampsites(query)
   if (result.data) {
-    userCampsites.value = result.data;
+    userCampsites.value = result.data
   }
 }
 
-onMounted(async function() {
-  const result = await UsersService.getCurrentUser();
-  if (result.data) {
-    userProfile.value = result.data;
-    syncRequest(editRequest, result.data);
-    await fetchUserCampsites();
+function openCampsiteDeleteModal(id: string) {
+  campsiteToDelete.value = id
+  showCampsiteDeleteModal.value = true
+}
+
+async function confirmDeleteCampsite() {
+  if (!campsiteToDelete.value) return
+  deletingCampsite.value = true
+  try {
+    await CampsitesService.deleteCampsiteById(campsiteToDelete.value)
+    await fetchUserCampsites()
+  } catch (err) {
+    console.error('Failed to delete campsite:', err)
+  } finally {
+    deletingCampsite.value = false
+    showCampsiteDeleteModal.value = false
+    campsiteToDelete.value = null
   }
-});
+}
+
+onMounted(async () => {
+  const result = await UsersService.getCurrentUser()
+  if (result.data) {
+    userProfile.value = result.data
+    syncRequest(editRequest, result.data)
+    await fetchUserCampsites()
+  }
+})
 
 async function handleUserDelete() {
-  if (confirm("Are you sure? This cannot be undone.")) {
-    deleting.value = true;
-    await UsersService.deleteCurrentUser();
-    AuthenticationService.logout();
-    router.push('/');
+  showDeleteModal.value = true
+}
+
+async function confirmDeleteUser() {
+  deleting.value = true
+  try {
+    await UsersService.deleteCurrentUser()
+    AuthenticationService.logout()
+    router.push('/')
+  } catch (err) {
+    console.error('Failed to delete user:', err)
+  } finally {
+    deleting.value = false
+    showDeleteModal.value = false
   }
 }
 
 function selectCampsite(camp: CampsiteProfile) {
-  router.push(`/app/campsites/${encodeURIComponent(camp.name)}`);
+  router.push(`/app/campsites/${encodeURIComponent(camp.name)}`)
 }
 
 function handleFileChange(event: Event) {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (!file) return;
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
 
-  const reader = new FileReader();
+  const reader = new FileReader()
   reader.onloadend = function() {
-    const base64String = (reader.result as string).split(',')[1];
-    editRequest.profilePicture = base64String;
-    handleSaveProfile(); 
-  };
-  reader.readAsDataURL(file);
+    const base64String = (reader.result as string).split(',')[1]
+    editRequest.profilePicture = base64String
+    handleSaveProfile()
+  }
+  reader.readAsDataURL(file)
 }
 
 async function handleSaveProfile() {
-  if (!userProfile.value || !hasChanges.value) return;
-  isSaving.value = true;
+  if (!userProfile.value || !hasChanges.value) return
+  isSaving.value = true
   
-  const payload = getDirtyFields(userProfile.value, editRequest);
-  const result = await UsersService.updateCurrentUser(payload);
+  const payload = getDirtyFields(userProfile.value, editRequest)
+  const result = await UsersService.updateCurrentUser(payload)
 
   if (result.error || result.data === null) {
-    alert(`Update failed: ${result?.error?.errors?.map(e => e.message).join('\n') || 'Unknown error'}`);
-    isSaving.value = false;
-    return;
+    errorMessage.value = result?.error?.errors?.map((e: any) => e.message).join('\n') || 'Unknown error'
+    showErrorModal.value = true
+    isSaving.value = false
+    return
   }
 
-  userProfile.value = result.data;
-  syncRequest(editRequest, result.data);
-  isSaving.value = false;
+  userProfile.value = result.data
+  syncRequest(editRequest, result.data)
+  isSaving.value = false
+}
+
+function resetEdit() {
+  if (userProfile.value) {
+    syncRequest(editRequest, userProfile.value)
+  }
 }
 </script>

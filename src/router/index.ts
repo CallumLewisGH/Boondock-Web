@@ -10,8 +10,6 @@ import Login from '@/views/Landing/LoginView.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import MapView from '@/views/App/MapView.vue'
 import ProfileView from '@/views/App/ProfileView.vue'
-import SettingsView from '@/views/App/SettingsView.vue'
-import SearchView from '@/views/App/SearchView.vue'
 import CampsiteView from '@/views/App/CampsiteView.vue'
 import UserView from '@/views/App/UserView.vue'
 
@@ -43,7 +41,6 @@ const router = createRouter({
         { path: 'campsites/:name', name: 'Campsite', component: CampsiteView, meta: { title: 'Campsite Details' }, props: true },
         { path: 'profile', name: 'Profile', component: ProfileView, meta: { title: 'Profile' } },
         { path: 'users/:name', name: 'User', component: UserView, meta: { title: 'User Profile' } },
-        { path: 'settings', name: 'Settings', component: SettingsView, meta: { title: 'Settings' } }
       ]
     },
     { path: '/:pathMatch(.*)*', name: 'NotFound', redirect: '/' }

@@ -2,7 +2,7 @@
   <transition name="slide">
     <div v-if="isOpen" class="sidebar-container" :class="{ 'expanded': isExpanded }">
       <!-- Expand/Collapse Arrow Button -->
-      <button @click="toggleExpanded" class="expand-btn" :title="isExpanded ? 'Collapse sidebar' : 'Expand sidebar'">
+      <button @click="toggleExpanded" class="expand-btn hover:opacity-80 cursor-pointer" :title="isExpanded ? 'Collapse sidebar' : 'Expand sidebar'">
         <span class="expand-arrow">{{ isExpanded ? '←' : '→' }}</span>
       </button>
 
@@ -34,75 +34,62 @@
           <div v-if="isOwner" class="space-y-4 pt-4 border-t" style="border-color: var(--border);">
             <div class="flex items-center justify-between">
               <h3 class="font-bold">Edit Details</h3>
-              <button 
-                @click="remove" 
-                class="text-xs font-bold uppercase text-red-500 hover:opacity-70 transition-opacity"
+              <Button 
+                label="Delete"
+                variant="danger"
                 :disabled="deleting"
-              >
-                {{ deleting ? 'Deleting...' : 'Delete' }}
-              </button>
+                @click="openDeleteModal"
+              />
             </div>
             
             <div class="space-y-3">
-              <div>
-                <label class="block text-xs font-semibold mb-1" style="color: var(--muted);">Campsite Name</label>
-                <input 
-                  type="text" 
-                  v-model="edited.name"
-                  class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 text-sm"
-                  style="background-color: var(--surface); border-color: var(--border); color: var(--text-color); --tw-ring-color: var(--accent);"
-                >
-              </div>
+              <TextInput 
+                :model-value="edited.name || ''"
+                label="Campsite Name"
+                placeholder="Enter campsite name"
+                @update:model-value="edited.name = $event"
+              />
 
-              <div>
-                <label class="block text-xs font-semibold mb-1" style="color: var(--muted);">Description</label>
-                <textarea 
-                  v-model="edited.description"
-                  class="textarea-control w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 text-sm"
-                  style="background-color: var(--surface); border-color: var(--border); color: var(--text-color); --tw-ring-color: var(--accent);"
-                  placeholder="Describe this campsite..."
-                ></textarea>
-              </div>
+              <CountedTextArea
+                :model-value="edited.description || ''"
+                label="Description"
+                placeholder="Describe this campsite..."
+                :max-length="500"
+                :show-count="true"
+                :rows="3"
+                @update:model-value="edited.description = $event"
+              />
 
               <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block text-xs font-semibold mb-1" style="color: var(--muted);">Latitude</label>
-                  <input 
-                    type="number" 
-                    step="any"
-                    v-model.number="edited.latitude"
-                    class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 text-sm"
-                    style="background-color: var(--surface); border-color: var(--border); color: var(--text-color); --tw-ring-color: var(--accent);"
-                  >
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold mb-1" style="color: var(--muted);">Longitude</label>
-                  <input 
-                    type="number" 
-                    step="any"
-                    v-model.number="edited.longitude"
-                    class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 text-sm"
-                    style="background-color: var(--surface); border-color: var(--border); color: var(--text-color); --tw-ring-color: var(--accent);"
-                  >
-                </div>
+                <TextInput 
+                  type="number"
+                  :model-value="String(edited.latitude || '')"
+                  label="Latitude"
+                  placeholder="0.0000"
+                  @update:model-value="edited.latitude = parseFloat($event) || 0"
+                />
+                <TextInput 
+                  type="number"
+                  :model-value="String(edited.longitude || '')"
+                  label="Longitude"
+                  placeholder="0.0000"
+                  @update:model-value="edited.longitude = parseFloat($event) || 0"
+                />
               </div>
               
               <div class="pt-2 flex items-center gap-2">
-                <button 
-                  @click="save"
+                <Button 
+                  label="Save"
+                  variant="primary"
                   :disabled="saving"
-                  class="flex-1 px-4 py-2 rounded-lg font-semibold transition-all disabled:opacity-50 text-sm"
-                  style="background-color: var(--accent); color: var(--header-text);"
-                >
-                  {{ saving ? 'Saving...' : 'Save' }}
-                </button>
-                <button 
+                  :loading-text="'Saving...'"
+                  @click="save"
+                />
+                <Button 
+                  label="Cancel"
+                  variant="outline"
                   @click="cancelEdit"
-                  class="flex-1 px-4 py-2 rounded-lg font-semibold border transition-all text-sm"
-                  style="border-color: var(--border); color: var(--muted);"
-                >
-                  Cancel
-                </button>
+                />
               </div>
             </div>
           </div>
@@ -120,6 +107,16 @@
       </div>
     </div>
   </transition>
+
+  <!-- Delete Confirmation Modal -->
+  <ConfirmDeleteModal
+    :is-open="showDeleteModal"
+    title="Delete Campsite"
+    message="Are you sure you want to delete this campsite? This action cannot be undone."
+    :is-deleting="deleting"
+    @confirm="confirmDelete"
+    @close="showDeleteModal = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -128,6 +125,10 @@ import { useRouter } from 'vue-router'
 import type { CampsiteProfile, UpdateCampsiteRequest } from '@/api'
 import { CampsitesService } from '@/services/CampsitesService'
 import { UsersService } from '@/services/UsersService'
+import TextInput from '@/components/ui/TextInput.vue'
+import CountedTextArea from '@/components/common/CountedTextArea.vue'
+import Button from '@/components/ui/Button.vue'
+import ConfirmDeleteModal from '@/components/ui/ConfirmDeleteModal.vue'
 
 const router = useRouter()
 
@@ -150,6 +151,7 @@ const deleting = ref(false)
 const isExpanded = ref(false)
 const currentUser = ref(null as any)
 const isOwner = ref(false)
+const showDeleteModal = ref(false)
 
 const edited = ref<Partial<UpdateCampsiteRequest>>({})
 
@@ -223,16 +225,26 @@ function save() {
 
 function remove() {
   if (!campsite.value?.id) return
-  if (!confirm('Are you sure? This cannot be undone.')) return
+  showDeleteModal.value = true
+}
+
+function openDeleteModal() {
+  showDeleteModal.value = true
+}
+
+function confirmDelete() {
+  if (!campsite.value?.id) return
 
   deleting.value = true
 
   CampsitesService.deleteCampsiteById(campsite.value.id).then(() => {
+    showDeleteModal.value = false
     emit('deleted')
     emit('close')
   }).catch(() => {
     deleting.value = false
   })
+  deleting.value = false
 }
 
 function cancelEdit() {

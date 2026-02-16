@@ -13,81 +13,94 @@
       </div>
     </div>
 
-    <div v-if="isOwner" class="mt-12 space-y-4">
-      <div class="p-6 rounded-xl shadow-md border" 
-           style="background-color: var(--card-bg); border-color: var(--border);">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="font-bold text-lg">Edit Campsite Details</h3>
-          <button @click="remove" 
-                  class="text-xs font-bold uppercase text-red-500 hover:opacity-70 transition-opacity"
-                  :disabled="deleting">
-            {{ deleting ? 'Deleting...' : 'Delete Campsite' }}
-          </button>
+    <!-- Tab Navigation (only show if owner) -->
+    <div v-if="isOwner" class="border-b mb-6" style="border-color: var(--border);">
+      <div class="flex space-x-4">
+        <button @click="activeTab = 'details'"
+          :class="['px-4 py-2 font-medium transition-all border-b-2']"
+          :style="{
+            borderColor: activeTab === 'details' ? 'var(--accent)' : 'transparent',
+            color: activeTab === 'details' ? 'var(--accent)' : 'var(--muted)'
+          }">
+          Details
+        </button>
+        <button @click="activeTab = 'reviews'"
+          :class="['px-4 py-2 font-medium transition-all border-b-2']"
+          :style="{
+            borderColor: activeTab === 'reviews' ? 'var(--accent)' : 'transparent',
+            color: activeTab === 'reviews' ? 'var(--accent)' : 'var(--muted)'
+          }">
+          Reviews
+        </button>
+      </div>
+    </div>
+
+    <!-- Details Tab (Edit Section) -->
+    <div v-if="activeTab === 'details' && isOwner" class="mt-6 space-y-4">
+      <FormCard 
+        :is-loading="saving"
+        submit-label="Save Changes"
+        cancel-label="Cancel"
+        @submit="save"
+        @cancel="cancelEdit"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-lg" :style="{ color: 'var(--text-color)' }">Edit Campsite Details</h3>
+          <Button 
+            label="Delete Campsite"
+            variant="danger"
+            size="sm"
+            :disabled="deleting"
+            :loading-text="'Deleting...'"
+            @click="remove"
+          />
         </div>
         
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-1">Campsite Name</label>
-            <input 
-              type="text" 
-              v-model="edited.name"
-              class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2"
-              style="background-color: var(--surface); border-color: var(--border); color: var(--text-color); --tw-ring-color: var(--accent);"
-            >
-          </div>
+        <TextInput 
+          :model-value="edited.name || ''"
+          label="Campsite Name"
+          placeholder="Enter campsite name"
+          required
+          @update:model-value="edited.name = $event"
+        />
 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium mb-1">Latitude</label>
-              <input 
-                type="number" 
-                step="any"
-                v-model.number="edited.latitude"
-                class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2"
-                style="background-color: var(--surface); border-color: var(--border); color: var(--text-color); --tw-ring-color: var(--accent);"
-              >
-            </div>
-            <div>
-              <label class="block text-sm font-medium mb-1">Longitude</label>
-              <input 
-                type="number" 
-                step="any"
-                v-model.number="edited.longitude"
-                class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2"
-                style="background-color: var(--surface); border-color: var(--border); color: var(--text-color); --tw-ring-color: var(--accent);"
-              >
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium mb-1">Description</label>
-            <textarea 
-              v-model="edited.description"
-              rows="4"
-              class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2"
-              style="background-color: var(--surface); border-color: var(--border); color: var(--text-color); --tw-ring-color: var(--accent);"
-            ></textarea>
-          </div>
-          
-          <div class="pt-4 flex items-center gap-3">
-            <button 
-              @click="save"
-              :disabled="saving"
-              class="px-6 py-2 rounded-lg font-bold transition-all disabled:opacity-50"
-              style="background-color: var(--accent); color: var(--header-text);"
-            >
-              {{ saving ? 'Saving...' : 'Save Changes' }}
-            </button>
-            <button 
-              @click="cancelEdit"
-              class="px-6 py-2 rounded-lg font-bold border transition-all"
-              style="border-color: var(--border); color: var(--muted);"
-            >
-              Cancel
-            </button>
-          </div>
+        <div class="grid grid-cols-2 gap-4">
+          <TextInput 
+            type="number"
+            :model-value="String(edited.latitude || '')"
+            label="Latitude"
+            placeholder="0.0000"
+            @update:model-value="edited.latitude = parseFloat($event) || 0"
+          />
+          <TextInput 
+            type="number"
+            :model-value="String(edited.longitude || '')"
+            label="Longitude"
+            placeholder="0.0000"
+            @update:model-value="edited.longitude = parseFloat($event) || 0"
+          />
         </div>
-      </div>
+
+        <CountedTextArea 
+          :model-value="edited.description || ''"
+          label="Description"
+          placeholder="Describe this campsite..."
+          :max-length="500"
+          :show-count="true"
+          :rows="4"
+          @update:model-value="edited.description = $event"
+        />
+      </FormCard>
+    </div>
+
+    <!-- Reviews Section -->
+    <div v-if="!isOwner || activeTab === 'reviews'" class="mt-6">
+      <h2 class="text-2xl font-bold mb-6" style="color: var(--text-color);">Reviews</h2>
+      <EmptyState 
+          icon=""
+          title="No Reviews Yet"
+          message="You haven't made any reviews yet. Share your experience!"
+        />
     </div>
   </div>
 
@@ -106,7 +119,19 @@
       ← Back to Map
     </button>
   </div>
+
+  <ConfirmDeleteModal
+  :is-open="showDeleteModal"
+  title="Delete Campsite"
+  message="Are you sure you want to delete this campsite? This action cannot be undone."
+  :is-deleting="deleting"
+  @confirm="confirmDelete"
+  @close="showDeleteModal = false"
+/>
+
 </template>
+
+
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
@@ -116,6 +141,12 @@ import { CampsitesService } from '@/services/CampsitesService'
 import { UsersService } from '@/services/UsersService'
 import { QueryBuilder } from '@/helpers/queryBuilder'
 import { CampsiteQueryFilters } from '@/queryFilters/campsiteQueryFilters'
+import TextInput from '@/components/ui/TextInput.vue'
+import CountedTextArea from '@/components/common/CountedTextArea.vue'
+import FormCard from '@/components/common/FormCard.vue'
+import Button from '@/components/ui/Button.vue'
+import ConfirmDeleteModal from '@/components/ui/ConfirmDeleteModal.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -126,6 +157,7 @@ const deleting = ref(false)
 const campsite = ref<CampsiteProfile | null>(null)
 const currentUser = ref(null as any)
 const isOwner = ref(false)
+const activeTab = ref('reviews')
 
 const edited = ref<Partial<UpdateCampsiteRequest>>({})
 
@@ -203,7 +235,14 @@ function cancelEdit() {
 
 async function remove() {
   if (!campsite.value) return
-  if (!confirm('Delete this campsite? This cannot be undone.')) return
+  // show modal instead of native confirm
+  showDeleteModal.value = true
+}
+
+const showDeleteModal = ref(false)
+
+async function confirmDelete() {
+  if (!campsite.value) return
   deleting.value = true
   try {
     await CampsitesService.deleteCampsiteById(campsite.value.id)
@@ -212,6 +251,7 @@ async function remove() {
     console.error('Failed to delete campsite:', err)
   } finally {
     deleting.value = false
+    showDeleteModal.value = false
   }
 }
 

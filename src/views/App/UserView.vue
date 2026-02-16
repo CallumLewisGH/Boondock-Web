@@ -79,17 +79,20 @@
           </div>
         </div>
       </div>
-        <div v-else class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
-             style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
-          {{ userProfile.username }} hasn't posted any campsites yet.
-        </div>
+        <EmptyState 
+          v-else
+          icon=""
+          title="No Campsites Yet"
+          message="This user hasn't posted any campsites yet."
+        />
       </div>
 
       <div v-else-if="activeTab === 'reviews'">
-        <div class="space-y-4 text-center py-10 rounded-lg border-2 border-dashed"
-             style="color: var(--muted); border-color: var(--border); background-color: var(--surface);">
-          No reviews yet.
-        </div>
+        <EmptyState 
+          icon=""
+          title="No Reviews Yet"
+          message="You haven't made any reviews yet. Share your experience!"
+        />
       </div>
     </div>
   </div>
@@ -116,6 +119,7 @@ import { QueryBuilder } from '@/helpers/queryBuilder'
 import { UserQueryFilters } from '@/queryFilters/userQueryFilters'
 import { CampsitesService } from '@/services/CampsitesService'
 import { CampsiteQueryFilters } from '@/queryFilters/campsiteQueryFilters'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 const route = useRoute()
 const router = useRouter()

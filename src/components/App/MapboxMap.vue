@@ -75,6 +75,20 @@
       </div>
     </transition>
   </div>
+
+  <!-- Location Error Modal -->
+  <Modal :is-open="showLocationErrorModal" title="Location Access Error" @close="showLocationErrorModal = false">
+    <p class="text-sm" :style="{ color: 'var(--text-color)' }">
+      Could not find your location. Please check your browser permissions and try again.
+    </p>
+    <template #footer>
+      <Button
+        label="Close"
+        variant="primary"
+        @click="showLocationErrorModal = false"
+      />
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
@@ -83,6 +97,8 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import CampsiteSidebar from './CampsiteSidebar.vue'
 import { CampsitesService } from '@/services/CampsitesService'
+import Modal from '@/components/ui/Modal.vue'
+import Button from '@/components/ui/Button.vue'
 import type { CampsiteProfile } from '@/api'
 
 const props = defineProps<{ accessToken: string }>()
@@ -108,6 +124,9 @@ const isCreationMode = ref(false)
 const isSubmitting = ref(false)
 const tempCoords = ref<{ lat: number, lng: number } | null>(null)
 const newCamp = reactive({ Name: '', Description: '' })
+
+// Notification State
+const showLocationErrorModal = ref(false)
 
 onMounted(async () => {
   await nextTick()
@@ -154,7 +173,8 @@ const refreshCampsites = async () => {
     const lat = camp.latitude ?? camp.latitude
     const lng = camp.longitude ?? camp.longitude
 
-    if (lat && lng) {
+    // Accept 0 coordinates — only skip when values are not finite numbers
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
       // 1. Create the Wrapper (Mapbox controls this)
       const wrapper = document.createElement('div')
       wrapper.className = 'marker-wrapper'
@@ -260,9 +280,8 @@ const locateUser = () => {
         essential: true
       })
     },
-    (err) => {
-      console.error("Locate failed:", err)
-      alert("Could not find your location. Please check your browser permissions.")
+    () => {
+      showLocationErrorModal.value = true
     },
     { enableHighAccuracy: true }
   )

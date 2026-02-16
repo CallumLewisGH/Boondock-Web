@@ -2,137 +2,154 @@
   <div class="max-w-6xl mx-auto p-6">
     <!-- Search Header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold mb-2">Search</h1>
-      <div class="flex gap-4">
-        <div class="flex-1 relative">
-          <input 
-            type="text" 
-            v-model="searchQuery"
-            @keyup.enter="performSearch"
-            placeholder="Search for campsites, users, or locations..."
-            class="w-full px-4 py-3 pl-12 rounded-lg border focus:outline-none focus:ring-2 focus:ring-orange-500"
-          >
-          <span class="absolute left-4 top-3.5 text-gray-400 text-xl">🔍</span>
-        </div>
-        <select 
-          v-model="searchType"
-          class="px-4 py-3 border rounded-lg"
-        >
-          <option value="campsites">Campsites</option>
-          <option value="users">Users</option>
-          <option value="locations">Locations</option>
-        </select>
-        <button 
+      <h1 class="text-3xl font-bold mb-4" :style="{ color: 'var(--text-color)' }">Search</h1>
+      <div class="flex gap-4 mb-4">
+        <TextInput 
+          :model-value="searchQuery"
+          placeholder="Search for campsites, users, or locations..."
+          @update:model-value="searchQuery = $event"
+          @blur="performSearch"
+        />
+        <Select 
+          :model-value="searchType"
+          :options="searchTypeOptions"
+          placeholder="Search Type"
+          @update:model-value="searchType = $event"
+        />
+        <Button 
+          label="Search"
+          variant="primary"
           @click="performSearch"
-          class="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-        >
-          Search
-        </button>
+        />
       </div>
     </div>
     
+    <!-- Filter Toggle -->
+    <div class="mb-6">
+      <button 
+        @click="showFilters = !showFilters"
+        class="text-sm font-semibold transition-colors"
+        :style="{ color: 'var(--accent)' }"
+      >
+        {{ showFilters ? '▼' : '▶' }} {{ showFilters ? 'Hide' : 'Show' }} Filters
+      </button>
+    </div>
+
     <!-- Filters -->
-    <div class="mb-8 p-4 bg-gray-50 rounded-lg">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="font-medium">Filters</h3>
-        <button @click="showFilters = !showFilters" class="text-sm text-orange-600">
-          {{ showFilters ? 'Hide' : 'Show' }} Filters
-        </button>
-      </div>
-      
-      <div v-if="showFilters" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <select v-model="filters.type" class="px-3 py-2 border rounded">
-          <option value="">All Types</option>
-          <option value="wild">Wild Camping</option>
-          <option value="forest">Forest</option>
-          <option value="mountain">Mountain</option>
-        </select>
-        
-        <select v-model="filters.rating" class="px-3 py-2 border rounded">
-          <option value="">Any Rating</option>
-          <option value="4">4+ Stars</option>
-          <option value="3">3+ Stars</option>
-        </select>
-        
-        <select v-model="filters.distance" class="px-3 py-2 border rounded">
-          <option value="">Any Distance</option>
-          <option value="10">Within 10km</option>
-          <option value="50">Within 50km</option>
-        </select>
-        
-        <select v-model="filters.accessibility" class="px-3 py-2 border rounded">
-          <option value="">All Access</option>
-          <option value="walkin">Walk-in Only</option>
-          <option value="vehicle">Vehicle Access</option>
-        </select>
+    <div v-if="showFilters" class="mb-8 p-4 rounded-lg border"
+         :style="{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border)' }">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Select 
+          :model-value="filters.type"
+          :options="typeOptions"
+          placeholder="Type"
+          @update:model-value="filters.type = $event"
+        />
+        <Select 
+          :model-value="filters.rating"
+          :options="ratingOptions"
+          placeholder="Rating"
+          @update:model-value="filters.rating = $event"
+        />
+        <Select 
+          :model-value="filters.distance"
+          :options="distanceOptions"
+          placeholder="Distance"
+          @update:model-value="filters.distance = $event"
+        />
+        <Select 
+          :model-value="filters.accessibility"
+          :options="accessibilityOptions"
+          placeholder="Accessibility"
+          @update:model-value="filters.accessibility = $event"
+        />
       </div>
     </div>
     
     <!-- Search Results -->
     <div v-if="searchResults.length > 0">
-      <h2 class="text-xl font-bold mb-4">
+      <h2 class="text-xl font-bold mb-4" :style="{ color: 'var(--text-color)' }">
         {{ searchResults.length }} Results for "{{ searchQuery }}"
       </h2>
       
+      <!-- Campsite Results Grid -->
       <div v-if="searchType === 'campsites'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div 
+        <Card 
           v-for="result in searchResults" 
           :key="result.id"
-          class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-          @click="$router.push(`/app/campsites/${result.id}`)"
+          @click="navigateToCampsite(result.id)"
         >
-          <div class="h-40 bg-gray-300 flex items-center justify-center text-4xl">
-            🏕️
-          </div>
-          <div class="p-4">
-            <h3 class="font-bold text-lg mb-1">{{ result.name }}</h3>
-            <p class="text-gray-600 text-sm mb-2">{{ result.location }}</p>
-            <div class="flex items-center justify-between">
-              <span class="text-yellow-500">★★★★☆</span>
-              <span class="text-sm text-gray-500">{{ result.distance }}km away</span>
+          <template #icon>
+            <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" :style="{ backgroundColor: 'var(--surface)' }">
+              🏕️
             </div>
-          </div>
-        </div>
+          </template>
+          <template #title>{{ result.name }}</template>
+          <template #description>{{ result.location }}</template>
+          <template #footer>
+            <div class="flex items-center justify-between text-xs">
+              <span>⭐ {{ result.rating }}/5</span>
+              <span :style="{ color: 'var(--muted)' }">{{ result.distance }}km</span>
+            </div>
+          </template>
+        </Card>
       </div>
       
-      <div v-else class="space-y-4">
-        <div 
+      <!-- User Results List -->
+      <div v-else class="space-y-3">
+        <Card 
           v-for="result in searchResults" 
           :key="result.id"
-          class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow cursor-pointer"
-          @click="$router.push(`/app/users/${result.id}`)"
+          @click="navigateToUser(result.id)"
         >
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
+          <template #icon>
+            <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg" :style="{ backgroundColor: 'var(--surface)' }">
               👤
             </div>
-            <div>
-              <h3 class="font-bold">{{ result.name }}</h3>
-              <p class="text-gray-600 text-sm">{{ result.bio }}</p>
-            </div>
-          </div>
-        </div>
+          </template>
+          <template #title>{{ result.name }}</template>
+          <template #description>{{ result.bio }}</template>
+        </Card>
       </div>
     </div>
     
     <!-- No Results / Initial State -->
-    <div v-else class="text-center py-12">
-      <div class="text-6xl mb-4">🔍</div>
-      <h3 class="text-xl font-bold mb-2">Search Boondock</h3>
-      <p class="text-gray-600 max-w-md mx-auto">
-        Find campsites, connect with other campers, or discover new locations.
-        Try searching for "forest campsites" or "mountain spots".
-      </p>
-    </div>
+    <EmptyState 
+      v-else
+      icon="🔍"
+      title="Search Boondock"
+      message="Find campsites, connect with other campers, or discover new locations. Try searching for 'forest campsites' or 'mountain spots'."
+    />
   </div>
+
+  <!-- Error Modal -->
+  <Modal :is-open="showErrorModal" title="Search Required" @close="showErrorModal = false">
+    <p class="text-sm" :style="{ color: 'var(--text-color)' }">
+      Please enter a search term to continue.
+    </p>
+    <template #footer>
+      <Button
+        label="Close"
+        variant="primary"
+        @click="showErrorModal = false"
+      />
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { TextInput, Select, Button, Modal } from '@/components'
+import Card from '@/components/common/Card.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
+
+const router = useRouter()
 
 const searchQuery = ref('')
 const searchType = ref('campsites')
 const showFilters = ref(false)
+const showErrorModal = ref(false)
 
 const filters = reactive({
   type: '',
@@ -143,13 +160,43 @@ const filters = reactive({
 
 const searchResults = ref<any[]>([])
 
-const performSearch = () => {
+const searchTypeOptions = [
+  { value: 'campsites', label: 'Campsites' },
+  { value: 'users', label: 'Users' },
+  { value: 'locations', label: 'Locations' }
+]
+
+const typeOptions = [
+  { value: '', label: 'All Types' },
+  { value: 'wild', label: 'Wild Camping' },
+  { value: 'forest', label: 'Forest' },
+  { value: 'mountain', label: 'Mountain' }
+]
+
+const ratingOptions = [
+  { value: '', label: 'Any Rating' },
+  { value: '4', label: '4+ Stars' },
+  { value: '3', label: '3+ Stars' }
+]
+
+const distanceOptions = [
+  { value: '', label: 'Any Distance' },
+  { value: '10', label: 'Within 10km' },
+  { value: '50', label: 'Within 50km' }
+]
+
+const accessibilityOptions = [
+  { value: '', label: 'All Access' },
+  { value: 'walkin', label: 'Walk-in Only' },
+  { value: 'vehicle', label: 'Vehicle Access' }
+]
+
+function performSearch() {
   if (!searchQuery.value.trim()) {
-    alert('Please enter a search term')
+    showErrorModal.value = true
     return
   }
   
-  // Mock search results
   if (searchType.value === 'campsites') {
     searchResults.value = [
       { id: 1, name: 'Forest Retreat', location: 'Lake District, UK', distance: 15, rating: 4.5 },
@@ -163,5 +210,13 @@ const performSearch = () => {
       { id: 3, name: 'Forest Fiona', bio: 'Nature photographer', location: 'Wales' },
     ]
   }
+}
+
+function navigateToCampsite(id: number) {
+  router.push(`/app/campsites/${id}`)
+}
+
+function navigateToUser(id: number) {
+  router.push(`/app/users/${id}`)
 }
 </script>
