@@ -9,6 +9,7 @@ export type CampsiteProfile = {
      * A URL to the JSON Schema for this object.
      */
     readonly $schema?: string;
+    boondockScore: number;
     createdAt: string;
     description: string;
     id: string;
@@ -16,7 +17,22 @@ export type CampsiteProfile = {
     longitude: number;
     name: string;
     ownerId: string;
+    reviews: Array<CampsiteReviewProfile> | null;
     updatedAt: string;
+};
+
+export type CampsiteReviewProfile = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    campsiteId: string;
+    createdAt: string;
+    description: string;
+    id: string;
+    ownerId: string;
+    rating: number;
+    title: string;
 };
 
 export type CreateCampsiteRequest = {
@@ -24,10 +40,20 @@ export type CreateCampsiteRequest = {
      * A URL to the JSON Schema for this object.
      */
     readonly $schema?: string;
-    Description: string;
-    Latitude: number | null;
-    Longitude: number | null;
-    Name: string;
+    description: string;
+    latitude: number | null;
+    longitude: number | null;
+    name: string;
+};
+
+export type CreateCampsiteReviewRequest = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    description: string;
+    rating: number;
+    title: string;
 };
 
 export type CreateUserRequest = {
@@ -35,9 +61,9 @@ export type CreateUserRequest = {
      * A URL to the JSON Schema for this object.
      */
     readonly $schema?: string;
-    AuthId: string;
-    Email: string;
-    Username: string;
+    authId: string;
+    email: string;
+    username: string;
 };
 
 export type ErrorDetail = {
@@ -102,6 +128,16 @@ export type UpdateCampsiteRequest = {
     name?: string;
 };
 
+export type UpdateCampsiteReviewRequest = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    description?: string;
+    rating?: number;
+    title?: string;
+};
+
 export type UpdateUserRequest = {
     /**
      * A URL to the JSON Schema for this object.
@@ -143,6 +179,7 @@ export type UserPublicProfile = {
 };
 
 export type CampsiteProfileWritable = {
+    boondockScore: number;
     createdAt: string;
     description: string;
     id: string;
@@ -150,20 +187,37 @@ export type CampsiteProfileWritable = {
     longitude: number;
     name: string;
     ownerId: string;
+    reviews: Array<CampsiteReviewProfileWritable> | null;
     updatedAt: string;
 };
 
+export type CampsiteReviewProfileWritable = {
+    campsiteId: string;
+    createdAt: string;
+    description: string;
+    id: string;
+    ownerId: string;
+    rating: number;
+    title: string;
+};
+
 export type CreateCampsiteRequestWritable = {
-    Description: string;
-    Latitude: number | null;
-    Longitude: number | null;
-    Name: string;
+    description: string;
+    latitude: number | null;
+    longitude: number | null;
+    name: string;
+};
+
+export type CreateCampsiteReviewRequestWritable = {
+    description: string;
+    rating: number;
+    title: string;
 };
 
 export type CreateUserRequestWritable = {
-    AuthId: string;
-    Email: string;
-    Username: string;
+    authId: string;
+    email: string;
+    username: string;
 };
 
 export type ErrorModelWritable = {
@@ -198,6 +252,12 @@ export type UpdateCampsiteRequestWritable = {
     latitude?: number;
     longitude?: number;
     name?: string;
+};
+
+export type UpdateCampsiteReviewRequestWritable = {
+    description?: string;
+    rating?: number;
+    title?: string;
 };
 
 export type UpdateUserRequestWritable = {
@@ -365,6 +425,33 @@ export type PatchCampsitesByIdResponses = {
 
 export type PatchCampsitesByIdResponse = PatchCampsitesByIdResponses[keyof PatchCampsitesByIdResponses];
 
+export type PostCampsitesByIdReviewsData = {
+    body: CreateCampsiteReviewRequestWritable;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/campsites/{id}/reviews';
+};
+
+export type PostCampsitesByIdReviewsErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PostCampsitesByIdReviewsError = PostCampsitesByIdReviewsErrors[keyof PostCampsitesByIdReviewsErrors];
+
+export type PostCampsitesByIdReviewsResponses = {
+    /**
+     * OK
+     */
+    200: CampsiteReviewProfile;
+};
+
+export type PostCampsitesByIdReviewsResponse = PostCampsitesByIdReviewsResponses[keyof PostCampsitesByIdReviewsResponses];
+
 export type GetDatabaseHealthData = {
     body?: never;
     path?: never;
@@ -414,6 +501,118 @@ export type PostDatabaseMigrationsResponses = {
 };
 
 export type PostDatabaseMigrationsResponse = PostDatabaseMigrationsResponses[keyof PostDatabaseMigrationsResponses];
+
+export type PostReviewsSearchData = {
+    body: Array<QueryParameter> | null;
+    path?: never;
+    query?: never;
+    url: '/reviews/search';
+};
+
+export type PostReviewsSearchErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PostReviewsSearchError = PostReviewsSearchErrors[keyof PostReviewsSearchErrors];
+
+export type PostReviewsSearchResponses = {
+    /**
+     * OK
+     */
+    200: Array<CampsiteReviewProfile> | null;
+};
+
+export type PostReviewsSearchResponse = PostReviewsSearchResponses[keyof PostReviewsSearchResponses];
+
+export type DeleteReviewsByIdData = {
+    body?: never;
+    path: {
+        /**
+         * ID (UUID)
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/reviews/{id}';
+};
+
+export type DeleteReviewsByIdErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type DeleteReviewsByIdError = DeleteReviewsByIdErrors[keyof DeleteReviewsByIdErrors];
+
+export type DeleteReviewsByIdResponses = {
+    /**
+     * OK
+     */
+    200: CampsiteReviewProfile;
+};
+
+export type DeleteReviewsByIdResponse = DeleteReviewsByIdResponses[keyof DeleteReviewsByIdResponses];
+
+export type GetReviewsByIdData = {
+    body?: never;
+    path: {
+        /**
+         * ID (UUID)
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/reviews/{id}';
+};
+
+export type GetReviewsByIdErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetReviewsByIdError = GetReviewsByIdErrors[keyof GetReviewsByIdErrors];
+
+export type GetReviewsByIdResponses = {
+    /**
+     * OK
+     */
+    200: CampsiteReviewProfile;
+};
+
+export type GetReviewsByIdResponse = GetReviewsByIdResponses[keyof GetReviewsByIdResponses];
+
+export type PatchReviewsByIdData = {
+    body: UpdateCampsiteReviewRequestWritable;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/reviews/{id}';
+};
+
+export type PatchReviewsByIdErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PatchReviewsByIdError = PatchReviewsByIdErrors[keyof PatchReviewsByIdErrors];
+
+export type PatchReviewsByIdResponses = {
+    /**
+     * OK
+     */
+    200: CampsiteReviewProfile;
+};
+
+export type PatchReviewsByIdResponse = PatchReviewsByIdResponses[keyof PatchReviewsByIdResponses];
 
 export type PostUsersData = {
     body: CreateUserRequestWritable;

@@ -227,10 +227,10 @@ const submitCampsite = async () => {
   isSubmitting.value = true
   try {
     const res = await CampsitesService.createCampsite({
-      Name: newCamp.Name,
-      Description: newCamp.Description,
-      Latitude: tempCoords.value.lat,
-      Longitude: tempCoords.value.lng
+      name: newCamp.Name,
+      description: newCamp.Description,
+      latitude: tempCoords.value.lat,
+      longitude: tempCoords.value.lng
     })
     if (res.data) {
       emit('campsiteCreated', res.data)

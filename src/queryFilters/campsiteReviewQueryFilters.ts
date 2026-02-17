@@ -1,17 +1,10 @@
 import type { QueryParameter } from "@/api";
 
-export class CampsiteQueryFilters {
-    static WithReviews(): QueryParameter {
+export class CampsiteReviewQueryFilters {
+    static WithTitles(titles: string[]): QueryParameter {
         return {
-            Name: "withreviews",
-            Value: []
-        };
-    }
-    
-    static WithNames(names: string[]): QueryParameter {
-        return {
-            Name: "withnames",
-            Value: names
+            Name: "withtitles",
+            Value: titles
         };
     }
 
@@ -29,10 +22,10 @@ export class CampsiteQueryFilters {
         };
     }
 
-    static WithinRadius(lat: number, lon: number, radiusKm: number): QueryParameter {
+    static WithCampsiteId(campsiteId: string): QueryParameter {
         return {
-            Name: "withinradius",
-            Value: [lat.toString(), lon.toString(), radiusKm.toString()]
+            Name: "withcampsiteid",
+            Value: [campsiteId]
         };
     }
 

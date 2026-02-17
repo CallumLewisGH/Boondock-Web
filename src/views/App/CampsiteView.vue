@@ -7,140 +7,116 @@
           "{{ campsite.description }}"
         </p>
       </div>
-      <div class="text-right p-4 rounded-xl border" style="background-color: var(--surface); border-color: var(--border);">
-        <div class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--muted);">Location</div>
-        <div class="font-mono font-medium">{{ campsite.latitude.toFixed(4) }}, {{ campsite.longitude.toFixed(4) }}</div>
+      
+      <div class="flex gap-4">
+        <div v-if="campsite.boondockScore !== undefined" class="text-center p-4 rounded-xl border" style="background-color: var(--surface); border-color: var(--border);">
+          <div class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--muted);">Score</div>
+          <div class="text-xl font-bold text-orange-500">★ {{ campsite.boondockScore.toFixed(1) }}</div>
+        </div>
+        <div class="text-right p-4 rounded-xl border" style="background-color: var(--surface); border-color: var(--border);">
+          <div class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--muted);">Location</div>
+          <div class="font-mono font-medium">{{ campsite.latitude.toFixed(4) }}, {{ campsite.longitude.toFixed(4) }}</div>
+        </div>
       </div>
     </div>
 
-    <!-- Tab Navigation (only show if owner) -->
     <div v-if="isOwner" class="border-b mb-6" style="border-color: var(--border);">
       <div class="flex space-x-4">
-        <button @click="activeTab = 'details'"
-          :class="['px-4 py-2 font-medium transition-all border-b-2']"
-          :style="{
-            borderColor: activeTab === 'details' ? 'var(--accent)' : 'transparent',
-            color: activeTab === 'details' ? 'var(--accent)' : 'var(--muted)'
-          }">
-          Details
+        <button @click="activeTab = 'details'" :class="['px-4 py-2 font-medium border-b-2 transition-all', activeTab === 'details' ? 'border-accent text-accent' : 'border-transparent text-muted']">
+          Edit Details
         </button>
-        <button @click="activeTab = 'reviews'"
-          :class="['px-4 py-2 font-medium transition-all border-b-2']"
-          :style="{
-            borderColor: activeTab === 'reviews' ? 'var(--accent)' : 'transparent',
-            color: activeTab === 'reviews' ? 'var(--accent)' : 'var(--muted)'
-          }">
+        <button @click="activeTab = 'reviews'" :class="['px-4 py-2 font-medium border-b-2 transition-all', activeTab === 'reviews' ? 'border-accent text-accent' : 'border-transparent text-muted']">
           Reviews
         </button>
       </div>
     </div>
 
-    <!-- Details Tab (Edit Section) -->
-    <div v-if="activeTab === 'details' && isOwner" class="mt-6 space-y-4">
-      <FormCard 
-        :is-loading="saving"
-        submit-label="Save Changes"
-        cancel-label="Cancel"
-        @submit="save"
-        @cancel="cancelEdit"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="font-bold text-lg" :style="{ color: 'var(--text-color)' }">Edit Campsite Details</h3>
-          <Button 
-            label="Delete Campsite"
-            variant="danger"
-            size="sm"
-            :disabled="deleting"
-            :loading-text="'Deleting...'"
-            @click="remove"
-          />
+    <div v-if="activeTab === 'details' && isOwner" class="mt-6">
+      <FormCard :is-loading="saving" submit-label="Save Changes" @submit="save" @cancel="cancelEdit">
+        <div class="flex justify-between mb-4">
+          <h3 class="font-bold text-lg">Campsite Settings</h3>
+          <Button label="Delete Campsite" variant="danger" size="sm" @click="triggerDeleteCampsite" />
         </div>
-        
-        <TextInput 
-          :model-value="edited.name || ''"
-          label="Campsite Name"
-          placeholder="Enter campsite name"
-          required
-          @update:model-value="edited.name = $event"
-        />
-
-        <div class="grid grid-cols-2 gap-4">
-          <TextInput 
-            type="number"
-            :model-value="String(edited.latitude || '')"
-            label="Latitude"
-            placeholder="0.0000"
-            @update:model-value="edited.latitude = parseFloat($event) || 0"
-          />
-          <TextInput 
-            type="number"
-            :model-value="String(edited.longitude || '')"
-            label="Longitude"
-            placeholder="0.0000"
-            @update:model-value="edited.longitude = parseFloat($event) || 0"
-          />
+        <TextInput :model-value="edited.name || ''" label="Name" @update:model-value="edited.name = $event" />
+        <div class="grid grid-cols-2 gap-4 mt-4">
+          <TextInput type="number" :model-value="String(edited.latitude || '')" label="Lat" @update:model-value="edited.latitude = parseFloat($event) || 0" />
+          <TextInput type="number" :model-value="String(edited.longitude || '')" label="Lng" @update:model-value="edited.longitude = parseFloat($event) || 0" />
         </div>
-
-        <CountedTextArea 
-          :model-value="edited.description || ''"
-          label="Description"
-          placeholder="Describe this campsite..."
-          :max-length="500"
-          :show-count="true"
-          :rows="4"
-          @update:model-value="edited.description = $event"
-        />
+        <CountedTextArea class="mt-4" :model-value="edited.description || ''" label="Description" :max-length="500" @update:model-value="edited.description = $event" />
       </FormCard>
     </div>
 
-    <!-- Reviews Section -->
     <div v-if="!isOwner || activeTab === 'reviews'" class="mt-6">
-      <h2 class="text-2xl font-bold mb-6" style="color: var(--text-color);">Reviews</h2>
-      <EmptyState 
-          icon=""
-          title="No Reviews Yet"
-          message="You haven't made any reviews yet. Share your experience!"
-        />
+      <div id="review-form" class="mb-12">
+        <FormCard 
+          v-if="!hasUserReviewed || isEditingReview"
+          :is-loading="submittingReview"
+          :submit-label="isEditingReview ? 'Update My Review' : 'Post Review'"
+          @submit="postReview"
+          @cancel="resetReviewForm"
+        >
+          <h3 class="font-bold text-xl mb-4">{{ isEditingReview ? 'Edit Your Review' : 'Leave a Review' }}</h3>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <TextInput type="number" label="Rating (1-10)" :model-value="String(newReview.rating)" @update:model-value="newReview.rating = parseInt($event) || 0" />
+            <div class="md:col-span-3">
+              <TextInput label="Title" placeholder="Sum it up..." :model-value="newReview.title" @update:model-value="newReview.title = $event" />
+            </div>
+          </div>
+          <CountedTextArea label="Comments" placeholder="How was the ground? Cell service?" :max-length="2000" :model-value="newReview.description" @update:model-value="newReview.description = $event" />
+        </FormCard>
+
+        <div v-else class="p-8 rounded-2xl border-2 border-dashed text-center" style="border-color: var(--border); background-color: var(--surface);">
+          <p class="mb-4 opacity-80">You've already reviewed this campsite!</p>
+          <Button label="Edit My Review" variant="outline" @click="startEditReview(userReview)" />
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <h2 class="text-2xl font-bold">Community Feedback</h2>
+        <div v-if="campsite.reviews && campsite.reviews.length > 0" class="space-y-4">
+          <div v-for="review in campsite.reviews" :key="review.id" class="p-6 rounded-2xl border" style="background-color: var(--surface); border-color: var(--border);">
+            <div class="flex justify-between items-start mb-4">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-orange-500 text-white font-black">{{ review.rating }}</div>
+                <div>
+                  <h4 class="font-bold text-lg">{{ review.title }} <span v-if="review.ownerId === campsite.ownerId" class="ml-2 text-[10px] bg-accent px-2 py-0.5 rounded text-white">Owner</span></h4>
+                  <p class="text-xs opacity-60">{{ new Date(review.createdAt).toLocaleDateString() }}</p>
+                </div>
+              </div>
+              <div v-if="currentUser && review.ownerId === currentUser.id" class="flex gap-2">
+                <button @click="startEditReview(review)" class="text-xs font-bold text-accent">Edit</button>
+                <button @click="triggerDeleteReview(review.id)" class="text-xs font-bold text-red-500">Delete</button>
+              </div>
+            </div>
+            <p class="text-sm leading-relaxed">{{ review.description }}</p>
+          </div>
+        </div>
+        <EmptyState v-else icon="💬" title="No Reviews Yet" message="Be the first to share!" />
+      </div>
     </div>
   </div>
 
-  <div v-else-if="loading" class="flex justify-center items-center min-h-[400px]">
-    <div class="animate-spin rounded-full h-12 w-12 border-b-2" style="border-color: var(--accent);"></div>
-  </div>
-
-  <div v-else class="flex flex-col justify-center items-center min-h-[400px] text-center">
-    <div class="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4" 
-         style="background-color: var(--surface); border-color: var(--border);">
-      🗺️
-    </div>
-    <h2 class="text-xl font-bold">Campsite not found</h2>
-    <p style="color: var(--muted);">The campsite you are looking for doesn't exist.</p>
-    <button @click="router.push('/app/map')" class="mt-6 font-bold" style="color: var(--accent);">
-      ← Back to Map
-    </button>
-  </div>
-
-  <ConfirmDeleteModal
-  :is-open="showDeleteModal"
-  title="Delete Campsite"
-  message="Are you sure you want to delete this campsite? This action cannot be undone."
-  :is-deleting="deleting"
-  @confirm="confirmDelete"
-  @close="showDeleteModal = false"
-/>
-
+  <ConfirmDeleteModal 
+    :is-open="deleteModal.isOpen" 
+    :title="deleteModal.title" 
+    :message="deleteModal.message" 
+    :is-deleting="deleting" 
+    @confirm="handleConfirmDelete" 
+    @close="deleteModal.isOpen = false" 
+  />
 </template>
 
-
-
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { CampsiteProfile, UpdateCampsiteRequest } from '@/api'
 import { CampsitesService } from '@/services/CampsitesService'
+import { CampsiteReviewsService } from '@/services/CampsiteReviewsService'
 import { UsersService } from '@/services/UsersService'
 import { QueryBuilder } from '@/helpers/queryBuilder'
 import { CampsiteQueryFilters } from '@/queryFilters/campsiteQueryFilters'
+
+// Components
 import TextInput from '@/components/ui/TextInput.vue'
 import CountedTextArea from '@/components/common/CountedTextArea.vue'
 import FormCard from '@/components/common/FormCard.vue'
@@ -151,110 +127,116 @@ import EmptyState from '@/components/common/EmptyState.vue'
 const route = useRoute()
 const router = useRouter()
 
-const loading = ref(true)
-const saving = ref(false)
-const deleting = ref(false)
 const campsite = ref<CampsiteProfile | null>(null)
 const currentUser = ref(null as any)
+const loading = ref(true)
 const isOwner = ref(false)
 const activeTab = ref('reviews')
 
+// Forms/State
 const edited = ref<Partial<UpdateCampsiteRequest>>({})
+const newReview = ref({ rating: 10, title: '', description: '' })
+const isEditingReview = ref(false)
+const editingReviewId = ref<string | null>(null)
+const saving = ref(false)
+const deleting = ref(false)
+const submittingReview = ref(false)
+
+// Delete Modal State
+const deleteModal = ref({ isOpen: false, type: 'campsite' as 'campsite' | 'review', targetId: '', title: '', message: '' })
+
+// Computed properties for "One Review" logic
+const hasUserReviewed = computed(() => {
+  if (!currentUser.value || !campsite.value?.reviews) return false
+  return campsite.value.reviews.some(r => r.ownerId === currentUser.value.id)
+})
+
+const userReview = computed(() => {
+  if (!currentUser.value || !campsite.value?.reviews) return null
+  return campsite.value.reviews.find(r => r.ownerId === currentUser.value.id)
+})
 
 async function fetchCampsite() {
   const name = route.params.name as string
-  if (!name) {
-    loading.value = false
-    return
-  }
+  if (!name) return
   loading.value = true
-
   try {
     const query = new QueryBuilder()
       .addParameter(CampsiteQueryFilters.WithNames([name]))
+      .addParameter(CampsiteQueryFilters.WithReviews())
       .build()
-
     const result = await CampsitesService.searchCampsites(query)
-    if (result.data && result.data.length > 0) {
-      const found = result.data[0]
-      if (!found) return
-      
-      campsite.value = found
-      edited.value = {
-        name: found.name,
-        description: found.description,
-        latitude: found.latitude,
-        longitude: found.longitude,
-      }
-
+    if (result.data && result.data.length > 0 && result.data[0]) {
+      campsite.value = result.data[0]
+      edited.value = { name: campsite.value.name, description: campsite.value.description, latitude: campsite.value.latitude, longitude: campsite.value.longitude }
       const userRes = await UsersService.getCurrentUser()
       if (userRes.data) {
         currentUser.value = userRes.data
-        isOwner.value = currentUser.value.id === found.ownerId
+        isOwner.value = currentUser.value.id === campsite.value.ownerId
       }
-    } else {
-      campsite.value = null
     }
-  } catch (err) {
-    console.error('Failed to fetch campsite:', err)
-    campsite.value = null
-  } finally {
-    loading.value = false
-  }
+  } finally { loading.value = false }
+}
+
+function startEditReview(review: any) {
+  newReview.value = { rating: review.rating, title: review.title, description: review.description }
+  isEditingReview.value = true
+  editingReviewId.value = review.id
+  document.getElementById('review-form')?.scrollIntoView({ behavior: 'smooth' })
+}
+
+function resetReviewForm() {
+  newReview.value = { rating: 10, title: '', description: '' }
+  isEditingReview.value = false
+  editingReviewId.value = null
+}
+
+async function postReview() {
+  if (!campsite.value) return
+  submittingReview.value = true
+  try {
+    if (isEditingReview.value && editingReviewId.value) {
+      await CampsiteReviewsService.updateReviewById(editingReviewId.value, newReview.value)
+    } else {
+      await CampsiteReviewsService.createReview(campsite.value.id, newReview.value)
+    }
+    resetReviewForm()
+    await fetchCampsite()
+  } finally { submittingReview.value = false }
+}
+
+function triggerDeleteCampsite() {
+  deleteModal.value = { isOpen: true, type: 'campsite', targetId: campsite.value!.id, title: 'Delete Campsite', message: 'Delete this entire campsite location?' }
+}
+
+function triggerDeleteReview(id: string) {
+  deleteModal.value = { isOpen: true, type: 'review', targetId: id, title: 'Delete Review', message: 'Remove your review from this campsite?' }
+}
+
+async function handleConfirmDelete() {
+  deleting.value = true
+  try {
+    if (deleteModal.value.type === 'campsite') {
+      await CampsitesService.deleteCampsiteById(deleteModal.value.targetId)
+      router.push('/app/map')
+    } else {
+      await CampsiteReviewsService.deleteReviewById(deleteModal.value.targetId)
+      await fetchCampsite()
+      deleteModal.value.isOpen = false
+    }
+  } finally { deleting.value = false }
 }
 
 async function save() {
   if (!campsite.value) return
   saving.value = true
-  
   try {
-    const res = await CampsitesService.updateCampsiteById(campsite.value.id, edited.value as UpdateCampsiteRequest)
-    if (res.data) {
-      campsite.value = res.data
-      syncEdited(res.data)
-    }
-  } catch (err) {
-    console.error('Failed to update campsite:', err)
-  } finally {
-    saving.value = false
-  }
+    await CampsitesService.updateCampsiteById(campsite.value.id, edited.value as UpdateCampsiteRequest)
+    await fetchCampsite()
+  } finally { saving.value = false }
 }
 
-function syncEdited(data: CampsiteProfile) {
-  edited.value = {
-    name: data.name,
-    description: data.description,
-    latitude: data.latitude,
-    longitude: data.longitude,
-  }
-}
-
-function cancelEdit() {
-  if (campsite.value) syncEdited(campsite.value)
-}
-
-async function remove() {
-  if (!campsite.value) return
-  // show modal instead of native confirm
-  showDeleteModal.value = true
-}
-
-const showDeleteModal = ref(false)
-
-async function confirmDelete() {
-  if (!campsite.value) return
-  deleting.value = true
-  try {
-    await CampsitesService.deleteCampsiteById(campsite.value.id)
-    router.push('/app/map')
-  } catch (err) {
-    console.error('Failed to delete campsite:', err)
-  } finally {
-    deleting.value = false
-    showDeleteModal.value = false
-  }
-}
-
-watch(() => route.params.name, () => fetchCampsite())
-onMounted(() => fetchCampsite())
+const cancelEdit = () => fetchCampsite()
+watch(() => route.params.name, fetchCampsite)
+onMounted(fetchCampsite)
 </script>

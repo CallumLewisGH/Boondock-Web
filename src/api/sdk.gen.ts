@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteCampsitesByIdData, DeleteCampsitesByIdErrors, DeleteCampsitesByIdResponses, DeleteUsersMeData, DeleteUsersMeErrors, DeleteUsersMeResponses, GetCampsitesByIdData, GetCampsitesByIdErrors, GetCampsitesByIdResponses, GetDatabaseHealthData, GetDatabaseHealthErrors, GetDatabaseHealthResponses, GetUsersByIdData, GetUsersByIdErrors, GetUsersByIdResponses, GetUsersMeData, GetUsersMeErrors, GetUsersMeResponses, PatchCampsitesByIdData, PatchCampsitesByIdErrors, PatchCampsitesByIdResponses, PatchUsersMeData, PatchUsersMeErrors, PatchUsersMeResponses, PostCampsitesData, PostCampsitesErrors, PostCampsitesResponses, PostCampsitesSearchData, PostCampsitesSearchErrors, PostCampsitesSearchResponses, PostDatabaseMigrationsData, PostDatabaseMigrationsErrors, PostDatabaseMigrationsResponses, PostUsersData, PostUsersErrors, PostUsersResponses, PostUsersSearchData, PostUsersSearchErrors, PostUsersSearchResponses } from './types.gen';
+import type { DeleteCampsitesByIdData, DeleteCampsitesByIdErrors, DeleteCampsitesByIdResponses, DeleteReviewsByIdData, DeleteReviewsByIdErrors, DeleteReviewsByIdResponses, DeleteUsersMeData, DeleteUsersMeErrors, DeleteUsersMeResponses, GetCampsitesByIdData, GetCampsitesByIdErrors, GetCampsitesByIdResponses, GetDatabaseHealthData, GetDatabaseHealthErrors, GetDatabaseHealthResponses, GetReviewsByIdData, GetReviewsByIdErrors, GetReviewsByIdResponses, GetUsersByIdData, GetUsersByIdErrors, GetUsersByIdResponses, GetUsersMeData, GetUsersMeErrors, GetUsersMeResponses, PatchCampsitesByIdData, PatchCampsitesByIdErrors, PatchCampsitesByIdResponses, PatchReviewsByIdData, PatchReviewsByIdErrors, PatchReviewsByIdResponses, PatchUsersMeData, PatchUsersMeErrors, PatchUsersMeResponses, PostCampsitesByIdReviewsData, PostCampsitesByIdReviewsErrors, PostCampsitesByIdReviewsResponses, PostCampsitesData, PostCampsitesErrors, PostCampsitesResponses, PostCampsitesSearchData, PostCampsitesSearchErrors, PostCampsitesSearchResponses, PostDatabaseMigrationsData, PostDatabaseMigrationsErrors, PostDatabaseMigrationsResponses, PostReviewsSearchData, PostReviewsSearchErrors, PostReviewsSearchResponses, PostUsersData, PostUsersErrors, PostUsersResponses, PostUsersSearchData, PostUsersSearchErrors, PostUsersSearchResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -76,6 +76,19 @@ export const patchCampsitesById = <ThrowOnError extends boolean = false>(options
 });
 
 /**
+ * Post campsites by ID reviews
+ */
+export const postCampsitesByIdReviews = <ThrowOnError extends boolean = false>(options: Options<PostCampsitesByIdReviewsData, ThrowOnError>) => (options.client ?? client).post<PostCampsitesByIdReviewsResponses, PostCampsitesByIdReviewsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/campsites/{id}/reviews',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Get database health
  */
 export const getDatabaseHealth = <ThrowOnError extends boolean = false>(options?: Options<GetDatabaseHealthData, ThrowOnError>) => (options?.client ?? client).get<GetDatabaseHealthResponses, GetDatabaseHealthErrors, ThrowOnError>({ url: '/database/health', ...options });
@@ -84,6 +97,50 @@ export const getDatabaseHealth = <ThrowOnError extends boolean = false>(options?
  * Post database migrations
  */
 export const postDatabaseMigrations = <ThrowOnError extends boolean = false>(options?: Options<PostDatabaseMigrationsData, ThrowOnError>) => (options?.client ?? client).post<PostDatabaseMigrationsResponses, PostDatabaseMigrationsErrors, ThrowOnError>({ url: '/database/migrations', ...options });
+
+/**
+ * Post reviews search
+ */
+export const postReviewsSearch = <ThrowOnError extends boolean = false>(options: Options<PostReviewsSearchData, ThrowOnError>) => (options.client ?? client).post<PostReviewsSearchResponses, PostReviewsSearchErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/reviews/search',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete reviews by ID
+ */
+export const deleteReviewsById = <ThrowOnError extends boolean = false>(options: Options<DeleteReviewsByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteReviewsByIdResponses, DeleteReviewsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/reviews/{id}',
+    ...options
+});
+
+/**
+ * Get reviews by ID
+ */
+export const getReviewsById = <ThrowOnError extends boolean = false>(options: Options<GetReviewsByIdData, ThrowOnError>) => (options.client ?? client).get<GetReviewsByIdResponses, GetReviewsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/reviews/{id}',
+    ...options
+});
+
+/**
+ * Patch reviews by ID
+ */
+export const patchReviewsById = <ThrowOnError extends boolean = false>(options: Options<PatchReviewsByIdData, ThrowOnError>) => (options.client ?? client).patch<PatchReviewsByIdResponses, PatchReviewsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/reviews/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Post users
