@@ -1,6 +1,5 @@
 <template>
   <div v-if="userProfile" class="max-w-4xl mx-auto p-6 min-h-screen">
-    <!-- Profile Header with Picture Edit -->
     <div class="relative mb-8">
       <button 
         @click="fileInput?.click()"
@@ -19,31 +18,34 @@
       <ProfileHeader :profile="userProfile" />
     </div>
     
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-2 gap-4 mb-8">
+    <div class="grid grid-cols-3 gap-4 mb-8">
       <div class="p-4 rounded-xl text-center border" 
            :style="{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border)' }">
         <div class="text-2xl font-bold" :style="{ color: 'var(--accent)' }">{{ userCampsites.length }}</div>
-        <div class="text-sm" :style="{ color: 'var(--muted)' }">Campsites Found</div>
+        <div class="text-xs font-bold uppercase tracking-tight" :style="{ color: 'var(--muted)' }">Found</div>
       </div>
+
       <div class="p-4 rounded-xl text-center border" 
            :style="{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border)' }">
-        <div class="text-2xl font-bold" :style="{ color: 'var(--accent)' }">0</div>
-        <div class="text-sm" :style="{ color: 'var(--muted)' }">Reviews Made</div>
+        <div class="text-2xl font-bold" :style="{ color: 'var(--accent)' }">{{ visitedCampsites.length }}</div>
+        <div class="text-xs font-bold uppercase tracking-tight" :style="{ color: 'var(--muted)' }">Visited</div>
+      </div>
+
+      <div class="p-4 rounded-xl text-center border" 
+           :style="{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border)' }">
+        <div class="text-2xl font-bold" :style="{ color: 'var(--accent)' }">{{ userReviews.length }}</div>
+        <div class="text-xs font-bold uppercase tracking-tight" :style="{ color: 'var(--muted)' }">Reviews</div>
       </div>
     </div>
 
-    <!-- Tab Navigation -->
     <TabNavigation 
       :tabs="tabs" 
       :active-tab="activeTab"
-      @select="activeTab = $event"
+      @select="activeTab = $event.toString()"
     />
     
-    <!-- Tab Content -->
     <div class="mt-6">
-      <!-- Campsites Tab -->
-      <div v-if="activeTab === 'campsites'">
+      <div v-if="activeTab === 'found'">
         <div v-if="userCampsites.length > 0" class="grid gap-4">
           <Card 
             v-for="camp in userCampsites" 
@@ -58,36 +60,74 @@
             <template #title>{{ camp.name }}</template>
             <template #description>{{ camp.description || 'No description provided.' }}</template>
             <template #action>
-              <div class="flex items-center gap-2">
-                <button
-                  @click.stop="selectCampsite(camp)"
-                  class="text-sm font-semibold"
-                  :style="{ color: 'var(--accent)' }"
-                >
-                  ›
-                </button>
-              </div>
+              <div style="color: var(--accent);">›</div>
             </template>
           </Card>
         </div>
         <EmptyState 
           v-else
           icon="⛺"
-          title="No Campsites Yet"
-          message="You haven't posted any campsites yet. Start by creating one!"
+          title="No Spots Found"
+          message="You haven't posted any campsites yet."
         />
       </div>
 
-      <!-- Reviews Tab -->
-      <div v-else-if="activeTab === 'reviews'">
+      <div v-else-if="activeTab === 'visited'">
+        <div v-if="visitedCampsites.length > 0" class="grid gap-4">
+          <Card 
+            v-for="camp in visitedCampsites" 
+            :key="camp.id"
+            @click="selectCampsite(camp)"
+          >
+            <template #icon>
+              <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" :style="{ backgroundColor: 'var(--surface)' }">
+                📍
+              </div>
+            </template>
+            <template #title>{{ camp.name }}</template>
+            <template #description>You have visited this location.</template>
+            <template #action>
+              <div style="color: var(--accent);">›</div>
+            </template>
+          </Card>
+        </div>
         <EmptyState 
-          icon=""
-          title="No Reviews Yet"
-          message="You haven't made any reviews yet. Share your experience!"
+          v-else
+          icon="📍"
+          title="No Visited Spots"
+          message="Campsites you mark as visited will appear here!"
         />
       </div>
 
-      <!-- Edit Profile Tab -->
+      <div v-else-if="activeTab === 'reviews'">
+        <div v-if="userReviews.length > 0" class="grid gap-4">
+          <Card 
+            v-for="review in userReviews" 
+            :key="review.id"
+            @click="goToCampsite(review.campsiteId)"
+          >
+            <template #icon>
+              <div class="w-12 h-12 rounded-lg flex items-center justify-center text-xl font-black text-white bg-orange-500">
+                {{ review.rating }}
+              </div>
+            </template>
+            <template #title>{{ review.title }}</template>
+            <template #description>{{ review.description }}</template>
+            <template #action>
+              <div class="text-xs font-bold uppercase opacity-50" :style="{ color: 'var(--accent)' }">
+                View Spot ›
+              </div>
+            </template>
+          </Card>
+        </div>
+        <EmptyState 
+          v-else
+          icon="💬"
+          title="No Reviews Yet"
+          message="Share your experience by reviewing a campsite!"
+        />
+      </div>
+
       <div v-else-if="activeTab === 'edit'">
         <div class="p-6 rounded-xl border" 
              :style="{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border)' }">
@@ -105,7 +145,6 @@
             <TextInput 
               :model-value="editRequest.username || ''"
               label="Username"
-              placeholder="Enter your username"
               required
               @update:model-value="editRequest.username = $event"
             />
@@ -114,7 +153,6 @@
               type="email"
               :model-value="editRequest.email || ''"
               label="Email"
-              placeholder="Enter your email"
               required
               @update:model-value="editRequest.email = $event"
             />
@@ -122,7 +160,6 @@
             <CountedTextArea 
               :model-value="editRequest.bio || ''"
               label="Bio"
-              placeholder="Tell us about yourself"
               :max-length="500"
               :show-count="true"
               :rows="3"
@@ -152,21 +189,15 @@
     <div class="animate-spin rounded-full h-12 w-12 border-b-2" :style="{ borderColor: 'var(--accent)' }"></div>
   </div>
 
-  <!-- Error Modal -->
   <Modal :is-open="showErrorModal" title="Update Failed" @close="showErrorModal = false">
     <p class="text-sm whitespace-pre-wrap" :style="{ color: 'var(--text-color)' }">
       {{ errorMessage }}
     </p>
     <template #footer>
-      <Button
-        label="Close"
-        variant="primary"
-        @click="showErrorModal = false"
-      />
+      <Button label="Close" variant="primary" @click="showErrorModal = false" />
     </template>
   </Modal>
 
-  <!-- Confirm Delete User Modal -->
   <ConfirmDeleteModal
     :is-open="showDeleteModal"
     title="Delete Account"
@@ -175,28 +206,17 @@
     @confirm="confirmDeleteUser"
     @close="showDeleteModal = false"
   />
-
-  <ConfirmDeleteModal
-    :is-open="showCampsiteDeleteModal"
-    title="Delete Campsite"
-    message="Are you sure you want to delete this campsite? This action cannot be undone."
-    :is-deleting="deletingCampsite"
-    @confirm="confirmDeleteCampsite"
-    @close="showCampsiteDeleteModal = false"
-  />
 </template>
 
 <script setup lang="ts">
-import type { UpdateUserRequest, UserPrivateProfile, CampsiteProfile } from '@/api'
+import { ref, reactive, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import type { UpdateUserRequest, UserPrivateProfile, CampsiteProfile, CampsiteReviewProfile } from '@/api'
 import { formatBase64 } from '@/helpers/base64'
 import { getDirtyFields, hasChanged, syncRequest } from '@/helpers/diff'
-import { useRouter } from 'vue-router'
-import { AuthenticationService } from '@/services/AuthenticationService'
-import { UsersService } from '@/services/UsersService'
-import { CampsitesService } from '@/services/CampsitesService'
 import { QueryBuilder } from '@/helpers/queryBuilder'
 import { CampsiteQueryFilters } from '@/queryFilters/campsiteQueryFilters'
-import { ref, reactive, onMounted, computed } from 'vue'
+import { CampsiteReviewQueryFilters } from '@/queryFilters/campsiteReviewQueryFilters'
 import { Modal, Button } from '@/components'
 import ConfirmDeleteModal from '@/components/ui/ConfirmDeleteModal.vue'
 import ProfileHeader from '@/components/common/ProfileHeader.vue'
@@ -205,23 +225,28 @@ import Card from '@/components/common/Card.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import TextInput from '@/components/ui/TextInput.vue'
 import CountedTextArea from '@/components/common/CountedTextArea.vue'
+import { CampsitesService } from '@/services/CampsitesService'
+import { CampsiteReviewsService } from '@/services/CampsiteReviewsService'
+import { UsersService } from '@/services/UsersService'
+import { AuthenticationService } from '@/services/AuthenticationService'
 
 const router = useRouter()
 
 const tabs = [
-  { id: 'campsites', label: 'My Campsites' },
+  { id: 'found', label: 'Found' },
+  { id: 'visited', label: 'Visited' },
   { id: 'reviews', label: 'Reviews' },
   { id: 'edit', label: 'Edit Profile' }
 ]
 
 const deleting = ref(false)
 const showDeleteModal = ref(false)
-const activeTab = ref<string | number>('campsites')
+const activeTab = ref('found')
 const userProfile = ref<UserPrivateProfile | null>(null)
 const userCampsites = ref<CampsiteProfile[]>([])
-const deletingCampsite = ref(false)
-const campsiteToDelete = ref<string | null>(null)
-const showCampsiteDeleteModal = ref(false)
+const visitedCampsites = ref<CampsiteProfile[]>([]) // Stub for visited logic
+const userReviews = ref<CampsiteReviewProfile[]>([])
+
 const isSaving = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
 const showErrorModal = ref(false)
@@ -231,8 +256,7 @@ const editRequest = reactive<UpdateUserRequest>({
   username: undefined,
   bio: undefined,
   email: undefined,
-  profilePicture: undefined,
-  timezone: undefined
+  profilePicture: undefined
 })
 
 const hasChanges = computed(() => {
@@ -240,36 +264,32 @@ const hasChanges = computed(() => {
   return hasChanged(userProfile.value, editRequest)
 })
 
-async function fetchUserCampsites() {
+async function fetchUserData() {
   if (!userProfile.value) return
-  const query = new QueryBuilder()
+  
+  // Fetch campsites created by user
+  const visitedQuery = new QueryBuilder()
+    .addParameter(CampsiteQueryFilters.VisitedByUserId(userProfile.value.id))
+    .build()
+
+  const foundQuery = new QueryBuilder()
     .addParameter(CampsiteQueryFilters.WithOwnerId(userProfile.value.id))
     .build()
   
-  const result = await CampsitesService.searchCampsites(query)
-  if (result.data) {
-    userCampsites.value = result.data
-  }
-}
+  // Fetch reviews written by user
+  const reviewQuery = new QueryBuilder()
+    .addParameter(CampsiteReviewQueryFilters.WithOwnerId(userProfile.value.id))
+    .build()
 
-function openCampsiteDeleteModal(id: string) {
-  campsiteToDelete.value = id
-  showCampsiteDeleteModal.value = true
-}
+  const [campsRes, reviewsRes, visitedCampsRes] = await Promise.all([
+    CampsitesService.searchCampsites(foundQuery),
+    CampsiteReviewsService.searchReviews(reviewQuery),
+    CampsitesService.searchCampsites(visitedQuery)
+  ])
 
-async function confirmDeleteCampsite() {
-  if (!campsiteToDelete.value) return
-  deletingCampsite.value = true
-  try {
-    await CampsitesService.deleteCampsiteById(campsiteToDelete.value)
-    await fetchUserCampsites()
-  } catch (err) {
-    console.error('Failed to delete campsite:', err)
-  } finally {
-    deletingCampsite.value = false
-    showCampsiteDeleteModal.value = false
-    campsiteToDelete.value = null
-  }
+  if (campsRes.data) userCampsites.value = campsRes.data
+  if (visitedCampsRes.data) visitedCampsites.value = visitedCampsRes.data
+  if (reviewsRes.data) userReviews.value = reviewsRes.data
 }
 
 onMounted(async () => {
@@ -277,25 +297,14 @@ onMounted(async () => {
   if (result.data) {
     userProfile.value = result.data
     syncRequest(editRequest, result.data)
-    await fetchUserCampsites()
+    await fetchUserData()
   }
 })
 
-async function handleUserDelete() {
-  showDeleteModal.value = true
-}
-
-async function confirmDeleteUser() {
-  deleting.value = true
-  try {
-    await UsersService.deleteCurrentUser()
-    AuthenticationService.logout()
-    router.push('/')
-  } catch (err) {
-    console.error('Failed to delete user:', err)
-  } finally {
-    deleting.value = false
-    showDeleteModal.value = false
+async function goToCampsite(campsiteId: string) {
+  const result = await CampsitesService.getCampsiteById(campsiteId)
+  if (result.data) {
+    router.push(`/app/campsites/${encodeURIComponent(result.data.name)}`)
   }
 }
 
@@ -303,29 +312,14 @@ function selectCampsite(camp: CampsiteProfile) {
   router.push(`/app/campsites/${encodeURIComponent(camp.name)}`)
 }
 
-function handleFileChange(event: Event) {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file) return
-
-  const reader = new FileReader()
-  reader.onloadend = function() {
-    const base64String = (reader.result as string).split(',')[1]
-    editRequest.profilePicture = base64String
-    handleSaveProfile()
-  }
-  reader.readAsDataURL(file)
-}
-
 async function handleSaveProfile() {
   if (!userProfile.value || !hasChanges.value) return
   isSaving.value = true
-  
   const payload = getDirtyFields(userProfile.value, editRequest)
   const result = await UsersService.updateCurrentUser(payload)
 
   if (result.error || result.data === null) {
-    errorMessage.value = result?.error?.errors?.map((e: any) => e.message).join('\n') || 'Unknown error'
+    errorMessage.value = result?.error?.errors?.[0]?.message || 'Unknown error'
     showErrorModal.value = true
     isSaving.value = false
     return
@@ -336,9 +330,31 @@ async function handleSaveProfile() {
   isSaving.value = false
 }
 
-function resetEdit() {
-  if (userProfile.value) {
-    syncRequest(editRequest, userProfile.value)
+function handleFileChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onloadend = () => {
+    editRequest.profilePicture = (reader.result as string).split(',')[1]
+    handleSaveProfile()
+  }
+  reader.readAsDataURL(file)
+}
+
+function resetEdit() { if (userProfile.value) syncRequest(editRequest, userProfile.value) }
+
+async function handleUserDelete() { showDeleteModal.value = true }
+
+async function confirmDeleteUser() {
+  deleting.value = true
+  try {
+    await UsersService.deleteCurrentUser()
+    AuthenticationService.logout()
+    router.push('/')
+  } finally {
+    deleting.value = false
+    showDeleteModal.value = false
   }
 }
 </script>

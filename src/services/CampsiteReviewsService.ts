@@ -1,5 +1,5 @@
 import { 
-    postCampsitesByIdReviews,
+    postCampsitesByCampsiteIdReviews,
     postReviewsSearch,
     getReviewsById,
     patchReviewsById,
@@ -20,8 +20,8 @@ export class CampsiteReviewsService {
      * Create a review for a specific campsite.
      */
     public static async createReview(campsiteId: string, body: CreateCampsiteReviewRequest): Promise<ApiResult<CampsiteReviewProfile>> {
-        const { data, error, response } = await postCampsitesByIdReviews({ 
-            path: { id: campsiteId }, 
+        const { data, error, response } = await postCampsitesByCampsiteIdReviews({ 
+            path: { campsiteId: campsiteId }, 
             body 
         });
         return { data, error, status: response.status } as ApiResult<CampsiteReviewProfile>;

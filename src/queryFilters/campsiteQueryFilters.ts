@@ -1,13 +1,12 @@
 import type { QueryParameter } from "@/api";
 
 export class CampsiteQueryFilters {
-    static WithReviews(): QueryParameter {
+    static VisitedByUserId(userId: string): QueryParameter {
         return {
-            Name: "withreviews",
-            Value: []
+            Name: "visitedbyuserid",
+            Value: [userId]
         };
     }
-    
     static WithNames(names: string[]): QueryParameter {
         return {
             Name: "withnames",

@@ -19,6 +19,7 @@ export type CampsiteProfile = {
     ownerId: string;
     reviews: Array<CampsiteReviewProfile> | null;
     updatedAt: string;
+    visits: Array<CampsiteVisitProfile> | null;
 };
 
 export type CampsiteReviewProfile = {
@@ -33,6 +34,18 @@ export type CampsiteReviewProfile = {
     ownerId: string;
     rating: number;
     title: string;
+};
+
+export type CampsiteVisitProfile = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    campsiteId: string;
+    createdAt: string;
+    id: string;
+    ownerId: string;
+    updatedAt: string;
 };
 
 export type CreateCampsiteRequest = {
@@ -117,6 +130,13 @@ export type QueryParameter = {
     Value: Array<string> | null;
 };
 
+export type ToggleCampsiteVisitRequest = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+};
+
 export type UpdateCampsiteRequest = {
     /**
      * A URL to the JSON Schema for this object.
@@ -189,6 +209,7 @@ export type CampsiteProfileWritable = {
     ownerId: string;
     reviews: Array<CampsiteReviewProfileWritable> | null;
     updatedAt: string;
+    visits: Array<CampsiteVisitProfileWritable> | null;
 };
 
 export type CampsiteReviewProfileWritable = {
@@ -199,6 +220,14 @@ export type CampsiteReviewProfileWritable = {
     ownerId: string;
     rating: number;
     title: string;
+};
+
+export type CampsiteVisitProfileWritable = {
+    campsiteId: string;
+    createdAt: string;
+    id: string;
+    ownerId: string;
+    updatedAt: string;
 };
 
 export type CreateCampsiteRequestWritable = {
@@ -338,6 +367,60 @@ export type PostCampsitesSearchResponses = {
 
 export type PostCampsitesSearchResponse = PostCampsitesSearchResponses[keyof PostCampsitesSearchResponses];
 
+export type PostCampsitesByCampsiteIdReviewsData = {
+    body: CreateCampsiteReviewRequestWritable;
+    path: {
+        campsiteId: string;
+    };
+    query?: never;
+    url: '/campsites/{campsiteId}/reviews';
+};
+
+export type PostCampsitesByCampsiteIdReviewsErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PostCampsitesByCampsiteIdReviewsError = PostCampsitesByCampsiteIdReviewsErrors[keyof PostCampsitesByCampsiteIdReviewsErrors];
+
+export type PostCampsitesByCampsiteIdReviewsResponses = {
+    /**
+     * OK
+     */
+    200: CampsiteReviewProfile;
+};
+
+export type PostCampsitesByCampsiteIdReviewsResponse = PostCampsitesByCampsiteIdReviewsResponses[keyof PostCampsitesByCampsiteIdReviewsResponses];
+
+export type PostCampsitesByCampsiteIdVisitsData = {
+    body: ToggleCampsiteVisitRequest;
+    path: {
+        campsiteId: string;
+    };
+    query?: never;
+    url: '/campsites/{campsiteId}/visits';
+};
+
+export type PostCampsitesByCampsiteIdVisitsErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PostCampsitesByCampsiteIdVisitsError = PostCampsitesByCampsiteIdVisitsErrors[keyof PostCampsitesByCampsiteIdVisitsErrors];
+
+export type PostCampsitesByCampsiteIdVisitsResponses = {
+    /**
+     * OK
+     */
+    200: CampsiteVisitProfile;
+};
+
+export type PostCampsitesByCampsiteIdVisitsResponse = PostCampsitesByCampsiteIdVisitsResponses[keyof PostCampsitesByCampsiteIdVisitsResponses];
+
 export type DeleteCampsitesByIdData = {
     body?: never;
     path: {
@@ -424,33 +507,6 @@ export type PatchCampsitesByIdResponses = {
 };
 
 export type PatchCampsitesByIdResponse = PatchCampsitesByIdResponses[keyof PatchCampsitesByIdResponses];
-
-export type PostCampsitesByIdReviewsData = {
-    body: CreateCampsiteReviewRequestWritable;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/campsites/{id}/reviews';
-};
-
-export type PostCampsitesByIdReviewsErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type PostCampsitesByIdReviewsError = PostCampsitesByIdReviewsErrors[keyof PostCampsitesByIdReviewsErrors];
-
-export type PostCampsitesByIdReviewsResponses = {
-    /**
-     * OK
-     */
-    200: CampsiteReviewProfile;
-};
-
-export type PostCampsitesByIdReviewsResponse = PostCampsitesByIdReviewsResponses[keyof PostCampsitesByIdReviewsResponses];
 
 export type GetDatabaseHealthData = {
     body?: never;
@@ -768,3 +824,28 @@ export type GetUsersByIdResponses = {
 };
 
 export type GetUsersByIdResponse = GetUsersByIdResponses[keyof GetUsersByIdResponses];
+
+export type PostVisitsSearchData = {
+    body: Array<QueryParameter> | null;
+    path?: never;
+    query?: never;
+    url: '/visits/search';
+};
+
+export type PostVisitsSearchErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PostVisitsSearchError = PostVisitsSearchErrors[keyof PostVisitsSearchErrors];
+
+export type PostVisitsSearchResponses = {
+    /**
+     * OK
+     */
+    200: Array<CampsiteVisitProfile> | null;
+};
+
+export type PostVisitsSearchResponse = PostVisitsSearchResponses[keyof PostVisitsSearchResponses];

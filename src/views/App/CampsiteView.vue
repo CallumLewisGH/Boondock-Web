@@ -6,9 +6,30 @@
         <p v-if="campsite.description" class="text-sm mt-2 italic" style="color: var(--muted);">
           "{{ campsite.description }}"
         </p>
+
+        <div class="mt-4 flex items-center gap-3">
+          <button 
+            @click="handleToggleVisit" 
+            :disabled="togglingVisit"
+            :class="['flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all border-2 text-sm', 
+              hasUserVisited 
+                ? 'bg-green-500/10 border-green-500 text-green-500' 
+                : 'bg-transparent border-dashed border-gray-400 hover:border-accent opacity-70 hover:opacity-100']"
+          >
+            <span v-if="togglingVisit" class="animate-spin mr-1">⏳</span>
+            <span v-else>{{ hasUserVisited ? '✓ Visited' : '＋ I\'ve Been Here' }}</span>
+          </button>
+          <span v-if="campsite.visits?.length" class="text-xs font-medium opacity-60">
+            {{ campsite.visits?.length }} {{ campsite.visits?.length === 1 ? 'person has' : 'people have' }} explored this spot
+          </span>
+        </div>
       </div>
       
       <div class="flex gap-4">
+        <div class="text-center p-4 rounded-xl border" style="background-color: var(--surface); border-color: var(--border);">
+          <div class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--muted);">Visits</div>
+          <div class="text-xl font-bold text-blue-500">📍 {{ campsite.visits?.length || 0 }}</div>
+        </div>
         <div v-if="campsite.boondockScore !== undefined" class="text-center p-4 rounded-xl border" style="background-color: var(--surface); border-color: var(--border);">
           <div class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--muted);">Score</div>
           <div class="text-xl font-bold text-orange-500">★ {{ campsite.boondockScore.toFixed(1) }}</div>
@@ -112,6 +133,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type { CampsiteProfile, UpdateCampsiteRequest } from '@/api'
 import { CampsitesService } from '@/services/CampsitesService'
 import { CampsiteReviewsService } from '@/services/CampsiteReviewsService'
+import { CampsiteVisitsService } from '@/services/CampsiteVisitsService'
 import { UsersService } from '@/services/UsersService'
 import { QueryBuilder } from '@/helpers/queryBuilder'
 import { CampsiteQueryFilters } from '@/queryFilters/campsiteQueryFilters'
@@ -141,11 +163,12 @@ const editingReviewId = ref<string | null>(null)
 const saving = ref(false)
 const deleting = ref(false)
 const submittingReview = ref(false)
+const togglingVisit = ref(false)
 
 // Delete Modal State
 const deleteModal = ref({ isOpen: false, type: 'campsite' as 'campsite' | 'review', targetId: '', title: '', message: '' })
 
-// Computed properties for "One Review" logic
+// Computed properties for Review logic
 const hasUserReviewed = computed(() => {
   if (!currentUser.value || !campsite.value?.reviews) return false
   return campsite.value.reviews.some(r => r.ownerId === currentUser.value.id)
@@ -156,6 +179,12 @@ const userReview = computed(() => {
   return campsite.value.reviews.find(r => r.ownerId === currentUser.value.id)
 })
 
+// Computed for Visit logic
+const hasUserVisited = computed(() => {
+  if (!currentUser.value || !campsite.value?.visits) return false
+  return campsite.value.visits.some(v => v.ownerId === currentUser.value.id)
+})
+
 async function fetchCampsite() {
   const name = route.params.name as string
   if (!name) return
@@ -163,19 +192,64 @@ async function fetchCampsite() {
   try {
     const query = new QueryBuilder()
       .addParameter(CampsiteQueryFilters.WithNames([name]))
-      .addParameter(CampsiteQueryFilters.WithReviews())
       .build()
+      
     const result = await CampsitesService.searchCampsites(query)
     if (result.data && result.data.length > 0 && result.data[0]) {
       campsite.value = result.data[0]
-      edited.value = { name: campsite.value.name, description: campsite.value.description, latitude: campsite.value.latitude, longitude: campsite.value.longitude }
+      edited.value = { 
+        name: campsite.value.name, 
+        description: campsite.value.description, 
+        latitude: campsite.value.latitude, 
+        longitude: campsite.value.longitude 
+      }
+      
       const userRes = await UsersService.getCurrentUser()
       if (userRes.data) {
         currentUser.value = userRes.data
         isOwner.value = currentUser.value.id === campsite.value.ownerId
       }
     }
-  } finally { loading.value = false }
+  } finally { 
+    loading.value = false 
+  }
+}
+
+async function handleToggleVisit() {
+  if (!campsite.value || !currentUser.value || !campsite.value.visits) return;
+  
+  togglingVisit.value = true
+  
+  const originalVisits = [...(campsite.value.visits || [])]
+  const alreadyVisited = hasUserVisited.value
+  
+
+  if (alreadyVisited) {
+    campsite.value.visits = campsite.value.visits.filter(v => v.ownerId !== currentUser.value.id)
+  } else {
+    const tempVisit = { 
+        id: 'temp',
+        ownerId: currentUser.value.id, 
+        campsiteId: campsite.value.id,
+        updatedAt: new Date().toISOString(),  
+        createdAt: new Date().toISOString() 
+    }
+    campsite.value.visits = [...originalVisits, tempVisit]
+  }
+
+  try {
+    const { error } = await CampsiteVisitsService.toggleVisit(campsite.value.id)
+    if (error) throw new Error()
+    
+    // 3. Re-fetch to sync real IDs and the backend-calculated Boondock Score
+    await fetchCampsite()
+  } catch (err) {
+    // 4. Rollback: If the API fails, revert the array to its original state
+    campsite.value.visits = originalVisits
+    console.error("Visit toggle failed:", err)
+  } finally {
+    togglingVisit.value = false
+  }
 }
 
 function startEditReview(review: any) {
@@ -202,15 +276,29 @@ async function postReview() {
     }
     resetReviewForm()
     await fetchCampsite()
-  } finally { submittingReview.value = false }
+  } finally { 
+    submittingReview.value = false 
+  }
 }
 
 function triggerDeleteCampsite() {
-  deleteModal.value = { isOpen: true, type: 'campsite', targetId: campsite.value!.id, title: 'Delete Campsite', message: 'Delete this entire campsite location?' }
+  deleteModal.value = { 
+    isOpen: true, 
+    type: 'campsite', 
+    targetId: campsite.value!.id, 
+    title: 'Delete Campsite', 
+    message: 'Delete this entire campsite location? This cannot be undone.' 
+  }
 }
 
 function triggerDeleteReview(id: string) {
-  deleteModal.value = { isOpen: true, type: 'review', targetId: id, title: 'Delete Review', message: 'Remove your review from this campsite?' }
+  deleteModal.value = { 
+    isOpen: true, 
+    type: 'review', 
+    targetId: id, 
+    title: 'Delete Review', 
+    message: 'Remove your review from this campsite?' 
+  }
 }
 
 async function handleConfirmDelete() {
@@ -224,7 +312,9 @@ async function handleConfirmDelete() {
       await fetchCampsite()
       deleteModal.value.isOpen = false
     }
-  } finally { deleting.value = false }
+  } finally { 
+    deleting.value = false 
+  }
 }
 
 async function save() {
@@ -233,7 +323,9 @@ async function save() {
   try {
     await CampsitesService.updateCampsiteById(campsite.value.id, edited.value as UpdateCampsiteRequest)
     await fetchCampsite()
-  } finally { saving.value = false }
+  } finally { 
+    saving.value = false 
+  }
 }
 
 const cancelEdit = () => fetchCampsite()

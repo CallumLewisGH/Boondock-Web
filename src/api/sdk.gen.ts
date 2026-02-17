@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteCampsitesByIdData, DeleteCampsitesByIdErrors, DeleteCampsitesByIdResponses, DeleteReviewsByIdData, DeleteReviewsByIdErrors, DeleteReviewsByIdResponses, DeleteUsersMeData, DeleteUsersMeErrors, DeleteUsersMeResponses, GetCampsitesByIdData, GetCampsitesByIdErrors, GetCampsitesByIdResponses, GetDatabaseHealthData, GetDatabaseHealthErrors, GetDatabaseHealthResponses, GetReviewsByIdData, GetReviewsByIdErrors, GetReviewsByIdResponses, GetUsersByIdData, GetUsersByIdErrors, GetUsersByIdResponses, GetUsersMeData, GetUsersMeErrors, GetUsersMeResponses, PatchCampsitesByIdData, PatchCampsitesByIdErrors, PatchCampsitesByIdResponses, PatchReviewsByIdData, PatchReviewsByIdErrors, PatchReviewsByIdResponses, PatchUsersMeData, PatchUsersMeErrors, PatchUsersMeResponses, PostCampsitesByIdReviewsData, PostCampsitesByIdReviewsErrors, PostCampsitesByIdReviewsResponses, PostCampsitesData, PostCampsitesErrors, PostCampsitesResponses, PostCampsitesSearchData, PostCampsitesSearchErrors, PostCampsitesSearchResponses, PostDatabaseMigrationsData, PostDatabaseMigrationsErrors, PostDatabaseMigrationsResponses, PostReviewsSearchData, PostReviewsSearchErrors, PostReviewsSearchResponses, PostUsersData, PostUsersErrors, PostUsersResponses, PostUsersSearchData, PostUsersSearchErrors, PostUsersSearchResponses } from './types.gen';
+import type { DeleteCampsitesByIdData, DeleteCampsitesByIdErrors, DeleteCampsitesByIdResponses, DeleteReviewsByIdData, DeleteReviewsByIdErrors, DeleteReviewsByIdResponses, DeleteUsersMeData, DeleteUsersMeErrors, DeleteUsersMeResponses, GetCampsitesByIdData, GetCampsitesByIdErrors, GetCampsitesByIdResponses, GetDatabaseHealthData, GetDatabaseHealthErrors, GetDatabaseHealthResponses, GetReviewsByIdData, GetReviewsByIdErrors, GetReviewsByIdResponses, GetUsersByIdData, GetUsersByIdErrors, GetUsersByIdResponses, GetUsersMeData, GetUsersMeErrors, GetUsersMeResponses, PatchCampsitesByIdData, PatchCampsitesByIdErrors, PatchCampsitesByIdResponses, PatchReviewsByIdData, PatchReviewsByIdErrors, PatchReviewsByIdResponses, PatchUsersMeData, PatchUsersMeErrors, PatchUsersMeResponses, PostCampsitesByCampsiteIdReviewsData, PostCampsitesByCampsiteIdReviewsErrors, PostCampsitesByCampsiteIdReviewsResponses, PostCampsitesByCampsiteIdVisitsData, PostCampsitesByCampsiteIdVisitsErrors, PostCampsitesByCampsiteIdVisitsResponses, PostCampsitesData, PostCampsitesErrors, PostCampsitesResponses, PostCampsitesSearchData, PostCampsitesSearchErrors, PostCampsitesSearchResponses, PostDatabaseMigrationsData, PostDatabaseMigrationsErrors, PostDatabaseMigrationsResponses, PostReviewsSearchData, PostReviewsSearchErrors, PostReviewsSearchResponses, PostUsersData, PostUsersErrors, PostUsersResponses, PostUsersSearchData, PostUsersSearchErrors, PostUsersSearchResponses, PostVisitsSearchData, PostVisitsSearchErrors, PostVisitsSearchResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -45,6 +45,32 @@ export const postCampsitesSearch = <ThrowOnError extends boolean = false>(option
 });
 
 /**
+ * Post campsites by campsite ID reviews
+ */
+export const postCampsitesByCampsiteIdReviews = <ThrowOnError extends boolean = false>(options: Options<PostCampsitesByCampsiteIdReviewsData, ThrowOnError>) => (options.client ?? client).post<PostCampsitesByCampsiteIdReviewsResponses, PostCampsitesByCampsiteIdReviewsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/campsites/{campsiteId}/reviews',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Post campsites by campsite ID visits
+ */
+export const postCampsitesByCampsiteIdVisits = <ThrowOnError extends boolean = false>(options: Options<PostCampsitesByCampsiteIdVisitsData, ThrowOnError>) => (options.client ?? client).post<PostCampsitesByCampsiteIdVisitsResponses, PostCampsitesByCampsiteIdVisitsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/campsites/{campsiteId}/visits',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Delete campsites by ID
  */
 export const deleteCampsitesById = <ThrowOnError extends boolean = false>(options: Options<DeleteCampsitesByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteCampsitesByIdResponses, DeleteCampsitesByIdErrors, ThrowOnError>({
@@ -68,19 +94,6 @@ export const getCampsitesById = <ThrowOnError extends boolean = false>(options: 
 export const patchCampsitesById = <ThrowOnError extends boolean = false>(options: Options<PatchCampsitesByIdData, ThrowOnError>) => (options.client ?? client).patch<PatchCampsitesByIdResponses, PatchCampsitesByIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/campsites/{id}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Post campsites by ID reviews
- */
-export const postCampsitesByIdReviews = <ThrowOnError extends boolean = false>(options: Options<PostCampsitesByIdReviewsData, ThrowOnError>) => (options.client ?? client).post<PostCampsitesByIdReviewsResponses, PostCampsitesByIdReviewsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/campsites/{id}/reviews',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -206,4 +219,17 @@ export const getUsersById = <ThrowOnError extends boolean = false>(options: Opti
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/users/{id}',
     ...options
+});
+
+/**
+ * Post visits search
+ */
+export const postVisitsSearch = <ThrowOnError extends boolean = false>(options: Options<PostVisitsSearchData, ThrowOnError>) => (options.client ?? client).post<PostVisitsSearchResponses, PostVisitsSearchErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/visits/search',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
