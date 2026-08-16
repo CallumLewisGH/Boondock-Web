@@ -66,6 +66,7 @@ import { CampsitesService } from '@/services/CampsitesService'
 import type { CampsiteProfile } from '@/api'
 import { TentIcon, CompassIcon, PineTreeIcon } from '@/components/icons'
 import { GlobeAltIcon, ViewfinderCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { Geolocation } from '@capacitor/geolocation'
 
 // Mapbox markers are plain DOM nodes outside Vue's render tree, so the tent
 // icon is inlined as raw SVG here rather than mounting a Vue component.
@@ -191,10 +192,9 @@ const toggleLayer = () => {
   map.value.once('style.load', refreshCampsites)
 }
 
-const locateUser = () => {
-  navigator.geolocation.getCurrentPosition((pos) => {
-    map.value?.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 14 })
-  })
+const locateUser = async () => {
+  const pos = await Geolocation.getCurrentPosition()
+  map.value?.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 14 })
 }
 
 const resetNorth = () => map.value?.easeTo({ bearing: 0, duration: 1000 })

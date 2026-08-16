@@ -1,8 +1,8 @@
 <template>
   <div class="h-screen flex flex-col transition-colors duration-300"
-       :style="{ backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }">
+       :style="{ backgroundColor: 'var(--bg-color)', color: 'var(--text-color)', paddingBottom: 'env(safe-area-inset-bottom)' }">
     <Header />
-    <main class="flex-1 overflow-y-auto pt-16"> 
+    <main class="flex-1 overflow-y-auto" :style="{ paddingTop: 'calc(4rem + env(safe-area-inset-top))' }">
       <router-view />
     </main>
   </div>

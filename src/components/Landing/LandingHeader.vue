@@ -1,8 +1,9 @@
 <template>
   <nav class="absolute w-full z-20 top-0 left-0 border-b backdrop-blur-md"
-       :style="{ 
+       :style="{
          borderColor: 'var(--border)',
-         backgroundColor: 'var(--header-bg)'  
+         backgroundColor: 'var(--header-bg)',
+         paddingTop: 'env(safe-area-inset-top)'
        }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">

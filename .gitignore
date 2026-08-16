@@ -36,6 +36,7 @@ coverage
 __screenshots__/
 
 .env
+.env.android
 
 .vscode
 .editorconfig

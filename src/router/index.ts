@@ -6,6 +6,7 @@ import Home from '@/views/Landing/HomeView.vue'
 import About from '@/views/Landing/AboutView.vue'
 import Guidelines from '@/views/Landing/GuidelinesView.vue'
 import Contact from '@/views/Landing/ContactView.vue'
+import Privacy from '@/views/Landing/PrivacyView.vue'
 import Login from '@/views/Landing/LoginView.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import MapView from '@/views/App/MapView.vue'
@@ -26,6 +27,7 @@ const router = createRouter({
         { path: '/about', name: 'About', component: About },
         { path: '/guidelines', name: 'Guidelines', component: Guidelines },
         { path: '/contact', name: 'Contact', component: Contact },
+        { path: '/privacy', name: 'Privacy', component: Privacy },
         { path: '/login', name: 'Login', component: Login, meta: { guestOnly: true } },
       ] 
     },

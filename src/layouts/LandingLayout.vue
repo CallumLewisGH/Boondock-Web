@@ -13,11 +13,15 @@
               backgroundColor: 'var(--bg-color)',
               borderColor: 'var(--border)'
             }">
-      <div class="max-w-7xl mx-auto px-4 text-center">
+      <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
         <p class="text-sm"
            :style="{ color: 'var(--muted)' }">
           © 2026 Boondock. The Mountain Awaits.
         </p>
+        <router-link to="/privacy" class="text-sm underline hover:no-underline"
+                     :style="{ color: 'var(--muted)' }">
+          Privacy Policy
+        </router-link>
       </div>
     </footer>
   </div>

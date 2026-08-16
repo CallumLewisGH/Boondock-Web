@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-0 left-0 right-0 z-50" style="background-color: var(--header-bg); color: var(--header-text);">
+  <div class="fixed top-0 left-0 right-0 z-50" style="background-color: var(--header-bg); color: var(--header-text); padding-top: env(safe-area-inset-top);">
     <div class="flex items-center justify-between p-4">
       <button @click="goHome()" class="flex-shrink-0 flex items-center gap-2 hover:opacity-80 transition-opacity">
         <TentIcon class="w-6 h-6" :style="{ color: 'var(--accent)' }" />
