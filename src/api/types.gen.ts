@@ -69,16 +69,6 @@ export type CreateCampsiteReviewRequest = {
     title: string;
 };
 
-export type CreateUserRequest = {
-    /**
-     * A URL to the JSON Schema for this object.
-     */
-    readonly $schema?: string;
-    authId: string;
-    email: string;
-    username: string;
-};
-
 export type ErrorDetail = {
     /**
      * Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id'
@@ -170,6 +160,14 @@ export type UpdateUserRequest = {
     username?: string;
 };
 
+export type UpdateUserRoleRequest = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    role: string;
+};
+
 export type UserPrivateProfile = {
     /**
      * A URL to the JSON Schema for this object.
@@ -181,6 +179,7 @@ export type UserPrivateProfile = {
     emailVerified: boolean;
     id: string;
     profilePicture?: string;
+    role: string;
     timezone?: string;
     updatedAt: string;
     username: string;
@@ -243,12 +242,6 @@ export type CreateCampsiteReviewRequestWritable = {
     title: string;
 };
 
-export type CreateUserRequestWritable = {
-    authId: string;
-    email: string;
-    username: string;
-};
-
 export type ErrorModelWritable = {
     /**
      * A human-readable explanation specific to this occurrence of the problem.
@@ -297,6 +290,10 @@ export type UpdateUserRequestWritable = {
     username?: string;
 };
 
+export type UpdateUserRoleRequestWritable = {
+    role: string;
+};
+
 export type UserPrivateProfileWritable = {
     bio?: string;
     createdAt: string;
@@ -304,6 +301,7 @@ export type UserPrivateProfileWritable = {
     emailVerified: boolean;
     id: string;
     profilePicture?: string;
+    role: string;
     timezone?: string;
     updatedAt: string;
     username: string;
@@ -670,31 +668,6 @@ export type PatchReviewsByIdResponses = {
 
 export type PatchReviewsByIdResponse = PatchReviewsByIdResponses[keyof PatchReviewsByIdResponses];
 
-export type PostUsersData = {
-    body: CreateUserRequestWritable;
-    path?: never;
-    query?: never;
-    url: '/users';
-};
-
-export type PostUsersErrors = {
-    /**
-     * Error
-     */
-    default: ErrorModel;
-};
-
-export type PostUsersError = PostUsersErrors[keyof PostUsersErrors];
-
-export type PostUsersResponses = {
-    /**
-     * OK
-     */
-    200: UserPrivateProfile;
-};
-
-export type PostUsersResponse = PostUsersResponses[keyof PostUsersResponses];
-
 export type DeleteUsersMeData = {
     body?: never;
     path?: never;
@@ -824,6 +797,36 @@ export type GetUsersByIdResponses = {
 };
 
 export type GetUsersByIdResponse = GetUsersByIdResponses[keyof GetUsersByIdResponses];
+
+export type PatchUsersByIdRoleData = {
+    body: UpdateUserRoleRequestWritable;
+    path: {
+        /**
+         * ID (UUID) of the user whose role is being changed
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/users/{id}/role';
+};
+
+export type PatchUsersByIdRoleErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PatchUsersByIdRoleError = PatchUsersByIdRoleErrors[keyof PatchUsersByIdRoleErrors];
+
+export type PatchUsersByIdRoleResponses = {
+    /**
+     * OK
+     */
+    200: UserPrivateProfile;
+};
+
+export type PatchUsersByIdRoleResponse = PatchUsersByIdRoleResponses[keyof PatchUsersByIdRoleResponses];
 
 export type PostVisitsSearchData = {
     body: Array<QueryParameter> | null;

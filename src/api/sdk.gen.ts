@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteCampsitesByIdData, DeleteCampsitesByIdErrors, DeleteCampsitesByIdResponses, DeleteReviewsByIdData, DeleteReviewsByIdErrors, DeleteReviewsByIdResponses, DeleteUsersMeData, DeleteUsersMeErrors, DeleteUsersMeResponses, GetCampsitesByIdData, GetCampsitesByIdErrors, GetCampsitesByIdResponses, GetDatabaseHealthData, GetDatabaseHealthErrors, GetDatabaseHealthResponses, GetReviewsByIdData, GetReviewsByIdErrors, GetReviewsByIdResponses, GetUsersByIdData, GetUsersByIdErrors, GetUsersByIdResponses, GetUsersMeData, GetUsersMeErrors, GetUsersMeResponses, PatchCampsitesByIdData, PatchCampsitesByIdErrors, PatchCampsitesByIdResponses, PatchReviewsByIdData, PatchReviewsByIdErrors, PatchReviewsByIdResponses, PatchUsersMeData, PatchUsersMeErrors, PatchUsersMeResponses, PostCampsitesByCampsiteIdReviewsData, PostCampsitesByCampsiteIdReviewsErrors, PostCampsitesByCampsiteIdReviewsResponses, PostCampsitesByCampsiteIdVisitsData, PostCampsitesByCampsiteIdVisitsErrors, PostCampsitesByCampsiteIdVisitsResponses, PostCampsitesData, PostCampsitesErrors, PostCampsitesResponses, PostCampsitesSearchData, PostCampsitesSearchErrors, PostCampsitesSearchResponses, PostDatabaseMigrationsData, PostDatabaseMigrationsErrors, PostDatabaseMigrationsResponses, PostReviewsSearchData, PostReviewsSearchErrors, PostReviewsSearchResponses, PostUsersData, PostUsersErrors, PostUsersResponses, PostUsersSearchData, PostUsersSearchErrors, PostUsersSearchResponses, PostVisitsSearchData, PostVisitsSearchErrors, PostVisitsSearchResponses } from './types.gen';
+import type { DeleteCampsitesByIdData, DeleteCampsitesByIdErrors, DeleteCampsitesByIdResponses, DeleteReviewsByIdData, DeleteReviewsByIdErrors, DeleteReviewsByIdResponses, DeleteUsersMeData, DeleteUsersMeErrors, DeleteUsersMeResponses, GetCampsitesByIdData, GetCampsitesByIdErrors, GetCampsitesByIdResponses, GetDatabaseHealthData, GetDatabaseHealthErrors, GetDatabaseHealthResponses, GetReviewsByIdData, GetReviewsByIdErrors, GetReviewsByIdResponses, GetUsersByIdData, GetUsersByIdErrors, GetUsersByIdResponses, GetUsersMeData, GetUsersMeErrors, GetUsersMeResponses, PatchCampsitesByIdData, PatchCampsitesByIdErrors, PatchCampsitesByIdResponses, PatchReviewsByIdData, PatchReviewsByIdErrors, PatchReviewsByIdResponses, PatchUsersByIdRoleData, PatchUsersByIdRoleErrors, PatchUsersByIdRoleResponses, PatchUsersMeData, PatchUsersMeErrors, PatchUsersMeResponses, PostCampsitesByCampsiteIdReviewsData, PostCampsitesByCampsiteIdReviewsErrors, PostCampsitesByCampsiteIdReviewsResponses, PostCampsitesByCampsiteIdVisitsData, PostCampsitesByCampsiteIdVisitsErrors, PostCampsitesByCampsiteIdVisitsResponses, PostCampsitesData, PostCampsitesErrors, PostCampsitesResponses, PostCampsitesSearchData, PostCampsitesSearchErrors, PostCampsitesSearchResponses, PostDatabaseMigrationsData, PostDatabaseMigrationsErrors, PostDatabaseMigrationsResponses, PostReviewsSearchData, PostReviewsSearchErrors, PostReviewsSearchResponses, PostUsersSearchData, PostUsersSearchErrors, PostUsersSearchResponses, PostVisitsSearchData, PostVisitsSearchErrors, PostVisitsSearchResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -109,7 +109,11 @@ export const getDatabaseHealth = <ThrowOnError extends boolean = false>(options?
 /**
  * Post database migrations
  */
-export const postDatabaseMigrations = <ThrowOnError extends boolean = false>(options?: Options<PostDatabaseMigrationsData, ThrowOnError>) => (options?.client ?? client).post<PostDatabaseMigrationsResponses, PostDatabaseMigrationsErrors, ThrowOnError>({ url: '/database/migrations', ...options });
+export const postDatabaseMigrations = <ThrowOnError extends boolean = false>(options?: Options<PostDatabaseMigrationsData, ThrowOnError>) => (options?.client ?? client).post<PostDatabaseMigrationsResponses, PostDatabaseMigrationsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/database/migrations',
+    ...options
+});
 
 /**
  * Post reviews search
@@ -148,19 +152,6 @@ export const getReviewsById = <ThrowOnError extends boolean = false>(options: Op
 export const patchReviewsById = <ThrowOnError extends boolean = false>(options: Options<PatchReviewsByIdData, ThrowOnError>) => (options.client ?? client).patch<PatchReviewsByIdResponses, PatchReviewsByIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/reviews/{id}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Post users
- */
-export const postUsers = <ThrowOnError extends boolean = false>(options: Options<PostUsersData, ThrowOnError>) => (options.client ?? client).post<PostUsersResponses, PostUsersErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/users',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -219,6 +210,19 @@ export const getUsersById = <ThrowOnError extends boolean = false>(options: Opti
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/users/{id}',
     ...options
+});
+
+/**
+ * Patch users by ID role
+ */
+export const patchUsersByIdRole = <ThrowOnError extends boolean = false>(options: Options<PatchUsersByIdRoleData, ThrowOnError>) => (options.client ?? client).patch<PatchUsersByIdRoleResponses, PatchUsersByIdRoleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/users/{id}/role',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
