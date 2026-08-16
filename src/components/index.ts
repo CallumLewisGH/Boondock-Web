@@ -34,6 +34,7 @@ export { default as TabNavigation } from './common/TabNavigation.vue'
 export { default as Card } from './common/Card.vue'
 export { default as EmptyState } from './common/EmptyState.vue'
 export { default as UserAvatar } from './common/UserAvatar.vue'
+export { default as ImagePicker } from './common/ImagePicker.vue'
 
 // Forms
 export { default as CountedTextArea } from './common/CountedTextArea.vue'

@@ -4,7 +4,7 @@
       <div v-if="profile.profilePicture" 
            class="w-20 h-20 rounded-full overflow-hidden border-2" 
            :style="{ borderColor: 'var(--border)' }">
-        <img :src="formatBase64(profile.profilePicture)" alt="Profile" class="w-full h-full object-cover" />
+        <img :src="profile.profilePicture" alt="Profile" class="w-full h-full object-cover" />
       </div>
       <div v-else
            class="w-20 h-20 rounded-full flex items-center justify-center border-2"
@@ -39,7 +39,6 @@
 </template>
 
 <script setup lang="ts">
-import { formatBase64 } from '@/helpers/base64'
 import { UserIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
 
 interface Profile {

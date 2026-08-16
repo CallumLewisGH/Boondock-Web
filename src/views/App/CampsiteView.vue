@@ -44,6 +44,17 @@
       </div>
     </div>
 
+    <div v-if="campsite.images && campsite.images.length > 0" class="flex gap-3 overflow-x-auto mb-8 pb-1">
+      <img
+        v-for="image in campsite.images"
+        :key="image"
+        :src="image"
+        alt="Campsite photo"
+        class="w-40 h-40 rounded-xl object-cover border flex-shrink-0"
+        style="border-color: var(--border);"
+      />
+    </div>
+
     <div v-if="isOwner" class="border-b mb-6" style="border-color: var(--border);">
       <div class="flex space-x-4">
         <button @click="activeTab = 'details'" :class="['px-4 py-2 font-medium border-b-2 transition-all', activeTab === 'details' ? 'border-accent text-accent' : 'border-transparent text-muted']">
@@ -67,6 +78,7 @@
           <TextInput type="number" :model-value="String(edited.longitude || '')" label="Lng" @update:model-value="edited.longitude = parseFloat($event) || 0" />
         </div>
         <CountedTextArea class="mt-4" :model-value="edited.description || ''" label="Description" :max-length="500" @update:model-value="edited.description = $event" />
+        <ImagePicker class="mt-4" :model-value="edited.images || []" label="Photos" :max-images="10" @update:model-value="edited.images = $event" />
       </FormCard>
     </div>
 
@@ -148,6 +160,7 @@ import FormCard from '@/components/common/FormCard.vue'
 import Button from '@/components/ui/Button.vue'
 import ConfirmDeleteModal from '@/components/ui/ConfirmDeleteModal.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
+import ImagePicker from '@/components/common/ImagePicker.vue'
 import { ArrowPathIcon, CheckIcon, PlusIcon, MapPinIcon, ChatBubbleLeftEllipsisIcon } from '@heroicons/vue/24/outline'
 import { StarIcon } from '@heroicons/vue/24/solid'
 
@@ -202,11 +215,12 @@ async function fetchCampsite() {
     const result = await CampsitesService.searchCampsites(query)
     if (result.data && result.data.length > 0 && result.data[0]) {
       campsite.value = result.data[0]
-      edited.value = { 
-        name: campsite.value.name, 
-        description: campsite.value.description, 
-        latitude: campsite.value.latitude, 
-        longitude: campsite.value.longitude 
+      edited.value = {
+        name: campsite.value.name,
+        description: campsite.value.description,
+        latitude: campsite.value.latitude,
+        longitude: campsite.value.longitude,
+        images: campsite.value.images ? [...campsite.value.images] : []
       }
       
       const userRes = await UsersService.getCurrentUser()

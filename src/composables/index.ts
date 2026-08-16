@@ -9,6 +9,7 @@ export { useFormValidation } from './useFormValidation'
 
 // Async Operations
 export { useAsync } from './useAsync'
+export { useImageUpload } from './useImageUpload'
 
 // UI State
 export { useModal } from './useModal'

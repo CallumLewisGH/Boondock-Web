@@ -42,6 +42,7 @@
               <label>Description</label>
               <textarea v-model="newCamp.Description" placeholder="Tell us about it..." rows="2"></textarea>
             </div>
+            <ImagePicker v-model="newCamp.Images" label="Photos" :max-images="10" />
           </div>
           <div class="flex gap-3">
             <button @click="cancelCreation" class="btn-secondary">Cancel</button>
@@ -60,6 +61,7 @@ import { ref, reactive, onMounted, onUnmounted, shallowRef, nextTick } from 'vue
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import CampsiteSidebar from './CampsiteSidebar.vue'
+import ImagePicker from '@/components/common/ImagePicker.vue'
 import { CampsitesService } from '@/services/CampsitesService'
 import type { CampsiteProfile } from '@/api'
 import { TentIcon, CompassIcon, PineTreeIcon } from '@/components/icons'
@@ -85,7 +87,7 @@ const isCreationMode = ref(false)
 const isSubmitting = ref(false)
 const tempCoords = ref<{ lat: number, lng: number } | null>(null)
 const tempMarker = shallowRef<mapboxgl.Marker | null>(null)
-const newCamp = reactive({ Name: '', Description: '' })
+const newCamp = reactive<{ Name: string, Description: string, Images: string[] }>({ Name: '', Description: '', Images: [] })
 
 onMounted(async () => {
   await nextTick()
@@ -160,7 +162,8 @@ const submitCampsite = async () => {
       name: newCamp.Name,
       description: newCamp.Description,
       latitude: tempCoords.value.lat,
-      longitude: tempCoords.value.lng
+      longitude: tempCoords.value.lng,
+      images: newCamp.Images
     })
     if (res.data) {
       cancelCreation()
@@ -177,7 +180,7 @@ const toggleCreationMode = () => {
 const cancelCreation = () => {
   isCreationMode.value = false
   tempCoords.value = null
-  newCamp.Name = ''; newCamp.Description = ''
+  newCamp.Name = ''; newCamp.Description = ''; newCamp.Images = []
   if (tempMarker.value) { tempMarker.value.remove(); tempMarker.value = null }
 }
 

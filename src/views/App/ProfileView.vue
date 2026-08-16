@@ -1,12 +1,14 @@
 <template>
   <div v-if="userProfile" class="max-w-4xl mx-auto p-6 min-h-screen">
     <div class="relative mb-8">
-      <button 
+      <button
         @click="fileInput?.click()"
-        class="absolute -top-2 -right-2 p-2 rounded-full shadow-lg hover:opacity-90 transition-opacity z-10"
+        :disabled="isUploadingPicture"
+        class="absolute -top-2 -right-2 p-2 rounded-full shadow-lg hover:opacity-90 transition-opacity z-10 disabled:opacity-60"
         style="background-color: var(--accent); color: var(--header-text);"
       >
-        <PencilSquareIcon class="w-5 h-5" />
+        <ArrowPathIcon v-if="isUploadingPicture" class="w-5 h-5 animate-spin" />
+        <PencilSquareIcon v-else class="w-5 h-5" />
       </button>
       <input 
         type="file" 
@@ -53,7 +55,8 @@
             @click="selectCampsite(camp)"
           >
             <template #icon>
-              <div class="w-12 h-12 rounded-lg flex items-center justify-center" :style="{ backgroundColor: 'var(--surface)', color: 'var(--accent)' }">
+              <img v-if="camp.images?.[0]" :src="camp.images[0]" alt="" class="w-12 h-12 rounded-lg object-cover" />
+              <div v-else class="w-12 h-12 rounded-lg flex items-center justify-center" :style="{ backgroundColor: 'var(--surface)', color: 'var(--accent)' }">
                 <TentIcon class="w-6 h-6" />
               </div>
             </template>
@@ -80,7 +83,8 @@
             @click="selectCampsite(camp)"
           >
             <template #icon>
-              <div class="w-12 h-12 rounded-lg flex items-center justify-center" :style="{ backgroundColor: 'var(--surface)', color: 'var(--accent)' }">
+              <img v-if="camp.images?.[0]" :src="camp.images[0]" alt="" class="w-12 h-12 rounded-lg object-cover" />
+              <div v-else class="w-12 h-12 rounded-lg flex items-center justify-center" :style="{ backgroundColor: 'var(--surface)', color: 'var(--accent)' }">
                 <MapPinIcon class="w-6 h-6" />
               </div>
             </template>
@@ -212,11 +216,11 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import type { UpdateUserRequest, UserPrivateProfile, CampsiteProfile, CampsiteReviewProfile } from '@/api'
-import { formatBase64 } from '@/helpers/base64'
 import { getDirtyFields, hasChanged, syncRequest } from '@/helpers/diff'
 import { QueryBuilder } from '@/helpers/queryBuilder'
 import { CampsiteQueryFilters } from '@/queryFilters/campsiteQueryFilters'
 import { CampsiteReviewQueryFilters } from '@/queryFilters/campsiteReviewQueryFilters'
+import { useImageUpload } from '@/composables/useImageUpload'
 import { Modal, Button } from '@/components'
 import ConfirmDeleteModal from '@/components/ui/ConfirmDeleteModal.vue'
 import ProfileHeader from '@/components/common/ProfileHeader.vue'
@@ -225,7 +229,7 @@ import Card from '@/components/common/Card.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import TextInput from '@/components/ui/TextInput.vue'
 import CountedTextArea from '@/components/common/CountedTextArea.vue'
-import { PencilSquareIcon, MapPinIcon, ChatBubbleLeftEllipsisIcon } from '@heroicons/vue/24/outline'
+import { PencilSquareIcon, MapPinIcon, ChatBubbleLeftEllipsisIcon, ArrowPathIcon } from '@heroicons/vue/24/outline'
 import { TentIcon } from '@/components/icons'
 import { CampsitesService } from '@/services/CampsitesService'
 import { CampsiteReviewsService } from '@/services/CampsiteReviewsService'
@@ -253,6 +257,8 @@ const isSaving = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
 const showErrorModal = ref(false)
 const errorMessage = ref('')
+
+const { isUploading: isUploadingPicture, error: uploadError, uploadImage } = useImageUpload()
 
 const editRequest = reactive<UpdateUserRequest>({
   username: undefined,
@@ -332,16 +338,21 @@ async function handleSaveProfile() {
   isSaving.value = false
 }
 
-function handleFileChange(event: Event) {
+async function handleFileChange(event: Event) {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
+  target.value = ''
   if (!file) return
-  const reader = new FileReader()
-  reader.onloadend = () => {
-    editRequest.profilePicture = (reader.result as string).split(',')[1]
-    handleSaveProfile()
+
+  const publicUrl = await uploadImage(file, 'profile')
+  if (!publicUrl) {
+    errorMessage.value = uploadError.value || 'Upload failed.'
+    showErrorModal.value = true
+    return
   }
-  reader.readAsDataURL(file)
+
+  editRequest.profilePicture = publicUrl
+  await handleSaveProfile()
 }
 
 function resetEdit() { if (userProfile.value) syncRequest(editRequest, userProfile.value) }

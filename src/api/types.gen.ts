@@ -13,6 +13,7 @@ export type CampsiteProfile = {
     createdAt: string;
     description: string;
     id: string;
+    images: Array<string> | null;
     latitude: number;
     longitude: number;
     name: string;
@@ -54,6 +55,7 @@ export type CreateCampsiteRequest = {
      */
     readonly $schema?: string;
     description: string;
+    images?: Array<string> | null;
     latitude: number | null;
     longitude: number | null;
     name: string;
@@ -67,6 +69,15 @@ export type CreateCampsiteReviewRequest = {
     description: string;
     rating: number;
     title: string;
+};
+
+export type CreateUploadRequest = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    contentType: string;
+    purpose: string;
 };
 
 export type ErrorDetail = {
@@ -133,6 +144,7 @@ export type UpdateCampsiteRequest = {
      */
     readonly $schema?: string;
     description?: string;
+    images?: Array<string> | null;
     latitude?: number;
     longitude?: number;
     name?: string;
@@ -166,6 +178,21 @@ export type UpdateUserRoleRequest = {
      */
     readonly $schema?: string;
     role: string;
+};
+
+export type UploadUrls = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    /**
+     * Where the file will be reachable once the upload completes
+     */
+    publicUrl: string;
+    /**
+     * PUT the file here directly, with the same Content-Type used to request this URL
+     */
+    uploadUrl: string;
 };
 
 export type UserPrivateProfile = {
@@ -202,6 +229,7 @@ export type CampsiteProfileWritable = {
     createdAt: string;
     description: string;
     id: string;
+    images: Array<string> | null;
     latitude: number;
     longitude: number;
     name: string;
@@ -231,6 +259,7 @@ export type CampsiteVisitProfileWritable = {
 
 export type CreateCampsiteRequestWritable = {
     description: string;
+    images?: Array<string> | null;
     latitude: number | null;
     longitude: number | null;
     name: string;
@@ -240,6 +269,11 @@ export type CreateCampsiteReviewRequestWritable = {
     description: string;
     rating: number;
     title: string;
+};
+
+export type CreateUploadRequestWritable = {
+    contentType: string;
+    purpose: string;
 };
 
 export type ErrorModelWritable = {
@@ -271,6 +305,7 @@ export type ErrorModelWritable = {
 
 export type UpdateCampsiteRequestWritable = {
     description?: string;
+    images?: Array<string> | null;
     latitude?: number;
     longitude?: number;
     name?: string;
@@ -292,6 +327,17 @@ export type UpdateUserRequestWritable = {
 
 export type UpdateUserRoleRequestWritable = {
     role: string;
+};
+
+export type UploadUrlsWritable = {
+    /**
+     * Where the file will be reachable once the upload completes
+     */
+    publicUrl: string;
+    /**
+     * PUT the file here directly, with the same Content-Type used to request this URL
+     */
+    uploadUrl: string;
 };
 
 export type UserPrivateProfileWritable = {
@@ -667,6 +713,31 @@ export type PatchReviewsByIdResponses = {
 };
 
 export type PatchReviewsByIdResponse = PatchReviewsByIdResponses[keyof PatchReviewsByIdResponses];
+
+export type PostUploadsData = {
+    body: CreateUploadRequestWritable;
+    path?: never;
+    query?: never;
+    url: '/uploads';
+};
+
+export type PostUploadsErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type PostUploadsError = PostUploadsErrors[keyof PostUploadsErrors];
+
+export type PostUploadsResponses = {
+    /**
+     * OK
+     */
+    200: UploadUrls;
+};
+
+export type PostUploadsResponse = PostUploadsResponses[keyof PostUploadsResponses];
 
 export type DeleteUsersMeData = {
     body?: never;

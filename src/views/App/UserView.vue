@@ -2,7 +2,7 @@
   <div v-if="userProfile" class="max-w-4xl mx-auto p-6 min-h-screen" style="color: var(--text-color);">
     <div class="flex items-center gap-6 mb-8">
       <div class="w-24 h-24 rounded-full overflow-hidden border-2 flex-shrink-0" style="border-color: var(--border);">
-        <img v-if="userProfile.profilePicture" :src="formatBase64(userProfile.profilePicture)" class="w-full h-full object-cover" />
+        <img v-if="userProfile.profilePicture" :src="userProfile.profilePicture" class="w-full h-full object-cover" />
         <div v-else class="w-full h-full flex items-center justify-center" style="background-color: var(--surface); color: var(--muted);"><UserIcon class="w-10 h-10" /></div>
       </div>
       <div class="flex-1 min-w-0">
@@ -41,7 +41,8 @@
       <div v-if="activeTab === 'campsites'">
         <div v-if="userCampsites.length > 0" class="grid gap-4">
           <div v-for="camp in userCampsites" :key="camp.id" @click="selectCampsite(camp)" class="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:scale-[1.01] transition-all" style="background-color: var(--card-bg); border-color: var(--border);">
-            <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: var(--surface); color: var(--accent);"><TentIcon class="w-6 h-6" /></div>
+            <img v-if="camp.images?.[0]" :src="camp.images[0]" alt="" class="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+            <div v-else class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color: var(--surface); color: var(--accent);"><TentIcon class="w-6 h-6" /></div>
             <div class="flex-1 min-w-0"><h3 class="font-bold truncate">{{ camp.name }}</h3><p class="text-sm line-clamp-1 opacity-60">{{ camp.description }}</p></div>
             <div style="color: var(--accent);">›</div>
           </div>
@@ -52,7 +53,8 @@
       <div v-else-if="activeTab === 'visited'">
         <div v-if="visitedCampsites.length > 0" class="grid gap-4">
           <div v-for="camp in visitedCampsites" :key="camp.id" @click="selectCampsite(camp)" class="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:scale-[1.01] transition-all" style="background-color: var(--card-bg); border-color: var(--border);">
-            <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: var(--surface); color: var(--accent);"><MapPinIcon class="w-6 h-6" /></div>
+            <img v-if="camp.images?.[0]" :src="camp.images[0]" alt="" class="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+            <div v-else class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color: var(--surface); color: var(--accent);"><MapPinIcon class="w-6 h-6" /></div>
             <div class="flex-1 min-w-0"><h3 class="font-bold truncate">{{ camp.name }}</h3><p class="text-sm opacity-60">Visited this spot</p></div>
             <div style="color: var(--accent);">›</div>
           </div>
@@ -82,7 +84,6 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { CampsiteProfile, UserPublicProfile, CampsiteReviewProfile } from '@/api'
-import { formatBase64 } from '@/helpers/base64'
 import { QueryBuilder } from '@/helpers/queryBuilder'
 import { UserQueryFilters } from '@/queryFilters/userQueryFilters'
 import { CampsiteQueryFilters } from '@/queryFilters/campsiteQueryFilters'

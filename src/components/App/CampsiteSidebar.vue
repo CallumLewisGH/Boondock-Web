@@ -12,6 +12,17 @@
         <button @click="$emit('close')" class="opacity-50 hover:opacity-100" aria-label="Close"><XMarkIcon class="w-5 h-5" /></button>
       </div>
 
+      <div v-if="campsite.images && campsite.images.length > 0" class="px-6 mb-4 flex gap-2 overflow-x-auto">
+        <img
+          v-for="image in campsite.images"
+          :key="image"
+          :src="image"
+          alt="Campsite photo"
+          class="w-24 h-24 rounded-lg object-cover border flex-shrink-0"
+          style="border-color: var(--border);"
+        />
+      </div>
+
       <div class="px-6 grid grid-cols-2 gap-3 mb-6">
         <div class="p-3 rounded-xl border border-dashed text-center"
              style="background-color: var(--surface); border-color: var(--border);">
