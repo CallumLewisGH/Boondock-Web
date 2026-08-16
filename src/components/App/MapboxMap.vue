@@ -6,18 +6,18 @@
       @close="closeSidebar"
     />
 
-    <div class="absolute top-6 right-6 flex flex-col gap-3 z-10">      
-      <button @click="toggleLayer" class="control-btn" :title="showSatellite ? 'Topographical' : 'Satellite'">
+    <div class="absolute top-6 right-6 flex flex-col gap-3 z-10">
+      <button @click="toggleLayer" class="control-btn" :class="showSatellite ? 'control-btn--green' : 'control-btn--blue'" :title="showSatellite ? 'Topographical' : 'Satellite'">
         <PineTreeIcon v-if="showSatellite" class="w-5 h-5" />
         <GlobeAltIcon v-else class="w-5 h-5" />
       </button>
-      <button @click="locateUser" class="control-btn" title="Find my location">
+      <button @click="locateUser" class="control-btn control-btn--blue" title="Find my location">
         <ViewfinderCircleIcon class="w-5 h-5" />
       </button>
-      <button @click="resetNorth" class="control-btn" title="Reset North">
+      <button @click="resetNorth" class="control-btn control-btn--orange" title="Reset North">
         <CompassIcon class="w-5 h-5" :style="{ transform: `rotate(${mapBearing}deg)`, display: 'inline-block' }" />
       </button>
-      <button @click="toggleCreationMode" class="control-btn" :class="{ 'active-mode': isCreationMode }">
+      <button @click="toggleCreationMode" class="control-btn control-btn--orange" :class="{ 'active-mode': isCreationMode }">
         <XMarkIcon v-if="isCreationMode" class="w-5 h-5" />
         <TentIcon v-else class="w-5 h-5" />
       </button>
@@ -203,8 +203,17 @@ onUnmounted(() => map.value?.remove())
 <style scoped>
 /* Re-use your existing styles here */
 .map-container { position: absolute; inset: 0; }
-.control-btn { width: 44px; height: 44px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-color); cursor: pointer; }
-.active-mode { background: var(--accent); color: white; }
+.control-btn {
+  width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s, background 0.15s;
+}
+.control-btn:hover { transform: scale(1.06); }
+.control-btn--orange { background: var(--card-bg); border-color: var(--accent); color: var(--accent); }
+.control-btn--blue { background: var(--card-bg); border-color: rgb(59, 130, 246); color: rgb(59, 130, 246); }
+.control-btn--green { background: var(--card-bg); border-color: rgb(34, 197, 94); color: rgb(34, 197, 94); }
+.active-mode { background: var(--accent) !important; border-color: var(--accent) !important; color: white !important; }
 :deep(.campsite-marker) {
   width: 34px; height: 34px; padding: 7px; box-sizing: border-box;
   display: flex; align-items: center; justify-content: center;

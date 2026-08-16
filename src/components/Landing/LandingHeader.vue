@@ -7,6 +7,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
         <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" @click="goHome">
+          <TentIcon class="w-7 h-7" :style="{ color: 'var(--accent)' }" />
           <span class="font-bold text-2xl tracking-wider uppercase text-white">Boondock</span>
         </div>
 
@@ -115,6 +116,7 @@ import router from '@/router'
 import { ref } from 'vue'
 import { useDarkMode } from '@/composables/useDarkMode'
 import { SunIcon, MoonIcon, Bars3Icon } from '@heroicons/vue/24/outline'
+import { TentIcon } from '@/components/icons'
 
 const { isDark, toggleDarkMode } = useDarkMode()
 const isMenuOpen = ref(false)
