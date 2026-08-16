@@ -1,0 +1,6 @@
+<template>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M15 9 13 13 9 15 11 11Z" fill="currentColor" stroke="none" />
+  </svg>
+</template>

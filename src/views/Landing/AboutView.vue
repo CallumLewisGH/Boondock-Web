@@ -63,7 +63,7 @@
                     :style="{ 
                       backgroundColor: isDark ? 'var(--card-bg)' : 'var(--border)'
                     }">
-                <span class="text-4xl">🏔️</span>
+                <MountainIcon class="w-14 h-14" :style="{ color: 'var(--accent)' }" />
               </div>
             </div>
             <div class="absolute -bottom-4 -right-4 w-2/3 h-2/3 rounded-2xl border-2 -z-10"
@@ -96,11 +96,11 @@
               borderColor: 'var(--border)'
             }"
           >
-            <div class="text-5xl mb-6 w-20 h-20 flex items-center justify-center rounded-full group-hover:scale-110 transition-transform"
-                  :style="{ 
+            <div class="mb-6 w-20 h-20 flex items-center justify-center rounded-full group-hover:scale-110 transition-transform"
+                  :style="{
                     backgroundColor: isDark ? 'var(--border)' : 'var(--surface)'
                   }">
-              {{ value.icon }}
+              <component :is="value.icon" class="w-10 h-10" :style="{ color: 'var(--accent)' }" />
             </div>
             <h3 class="text-xl font-bold mb-3"
                 :style="{ color: 'var(--text-color)' }">
@@ -125,7 +125,7 @@
                       :style="{ 
                         backgroundColor: isDark ? 'var(--card-bg)' : 'var(--border)'
                       }">
-                  <span class="text-6xl">🏕️</span>
+                  <TentIcon class="w-20 h-20" :style="{ color: 'var(--accent)' }" />
                 </div>
               </div>
             </div>
@@ -187,6 +187,8 @@
 import router from '@/router'
 
 import { useDarkMode } from '@/composables/useDarkMode'
+import { UsersIcon, ArrowsPointingOutIcon } from '@heroicons/vue/24/outline'
+import { MountainIcon, TentIcon, LeafIcon } from '@/components/icons'
 
 const { isDark } = useDarkMode()
 
@@ -198,17 +200,17 @@ const values = [
   {
     title: 'Respect the Land',
     desc: 'Every spot we share comes with a responsibility. We prioritize locations that can handle respectful visitation.',
-    icon: '🌱'
+    icon: LeafIcon
   },
   {
     title: 'Community First',
     desc: 'Verified by you, for you. Our community-driven approach ensures quality and trust in every shared location.',
-    icon: '🤝'
+    icon: UsersIcon
   },
   {
     title: 'Freedom to Roam',
     desc: 'We believe in the right to responsible wild camping. Our tools empower exploration.',
-    icon: '🗽'
+    icon: ArrowsPointingOutIcon
   }
 ]
 </script>

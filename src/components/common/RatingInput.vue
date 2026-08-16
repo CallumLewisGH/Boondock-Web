@@ -5,7 +5,7 @@
         {{ label }}
         <span v-if="required" class="text-red-500">*</span>
       </label>
-      <span v-if="showRating" class="text-lg">{{ modelValue }}/{{ maxRating }}⭐</span>
+      <span v-if="showRating" class="text-sm flex items-center gap-1">{{ modelValue }}/{{ maxRating }} <StarIcon class="w-4 h-4" style="color: var(--accent);" /></span>
     </div>
     <div class="flex gap-1">
       <button
@@ -13,10 +13,10 @@
         :key="i"
         @click="updateRating(i)"
         @hover="hoverRating = i"
-        class="text-2xl transition-transform hover:scale-110 cursor-pointer"
-        :style="{ opacity: i <= (hoverRating || modelValue) ? 1 : 0.3 }"
+        class="transition-transform hover:scale-110 cursor-pointer"
+        :style="{ opacity: i <= (hoverRating || modelValue) ? 1 : 0.3, color: 'var(--accent)' }"
       >
-        ⭐
+        <StarIcon class="w-6 h-6" />
       </button>
     </div>
     <p v-if="hint" class="text-xs" :style="{ color: 'var(--muted)' }">{{ hint }}</p>
@@ -25,6 +25,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { StarIcon } from '@heroicons/vue/24/solid'
 
 defineProps<{
   modelValue: number

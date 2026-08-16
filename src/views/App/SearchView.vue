@@ -80,15 +80,15 @@
           @click="navigateToCampsite(result.id)"
         >
           <template #icon>
-            <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" :style="{ backgroundColor: 'var(--surface)' }">
-              🏕️
+            <div class="w-12 h-12 rounded-lg flex items-center justify-center" :style="{ backgroundColor: 'var(--surface)', color: 'var(--accent)' }">
+              <TentIcon class="w-6 h-6" />
             </div>
           </template>
           <template #title>{{ result.name }}</template>
           <template #description>{{ result.location }}</template>
           <template #footer>
             <div class="flex items-center justify-between text-xs">
-              <span>⭐ {{ result.rating }}/5</span>
+              <span class="flex items-center gap-1"><StarIcon class="w-3.5 h-3.5" style="color: var(--accent);" /> {{ result.rating }}/5</span>
               <span :style="{ color: 'var(--muted)' }">{{ result.distance }}km</span>
             </div>
           </template>
@@ -103,8 +103,8 @@
           @click="navigateToUser(result.id)"
         >
           <template #icon>
-            <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg" :style="{ backgroundColor: 'var(--surface)' }">
-              👤
+            <div class="w-12 h-12 rounded-full flex items-center justify-center" :style="{ backgroundColor: 'var(--surface)', color: 'var(--muted)' }">
+              <UserIcon class="w-6 h-6" />
             </div>
           </template>
           <template #title>{{ result.name }}</template>
@@ -114,9 +114,9 @@
     </div>
     
     <!-- No Results / Initial State -->
-    <EmptyState 
+    <EmptyState
       v-else
-      icon="🔍"
+      :icon="MagnifyingGlassIcon"
       title="Search Boondock"
       message="Find campsites, connect with other campers, or discover new locations. Try searching for 'forest campsites' or 'mountain spots'."
     />
@@ -143,6 +143,9 @@ import { useRouter } from 'vue-router'
 import { TextInput, Select, Button, Modal } from '@/components'
 import Card from '@/components/common/Card.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
+import { MagnifyingGlassIcon, UserIcon } from '@heroicons/vue/24/outline'
+import { StarIcon } from '@heroicons/vue/24/solid'
+import { TentIcon } from '@/components/icons'
 
 const router = useRouter()
 

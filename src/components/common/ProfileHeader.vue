@@ -6,10 +6,10 @@
            :style="{ borderColor: 'var(--border)' }">
         <img :src="formatBase64(profile.profilePicture)" alt="Profile" class="w-full h-full object-cover" />
       </div>
-      <div v-else 
-           class="w-20 h-20 rounded-full flex items-center justify-center text-3xl border-2" 
-           :style="{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }">
-        👤
+      <div v-else
+           class="w-20 h-20 rounded-full flex items-center justify-center border-2"
+           :style="{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--muted)' }">
+        <UserIcon class="w-10 h-10" />
       </div>
     </div>
 
@@ -32,7 +32,7 @@
         :style="{ backgroundColor: 'var(--accent)', color: 'var(--header-text)' }"
         aria-label="Edit profile"
       >
-        ✏️
+        <PencilSquareIcon class="w-5 h-5" />
       </button>
     </div>
   </div>
@@ -40,6 +40,7 @@
 
 <script setup lang="ts">
 import { formatBase64 } from '@/helpers/base64'
+import { UserIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
 
 interface Profile {
   username: string

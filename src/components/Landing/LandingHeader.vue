@@ -33,12 +33,13 @@
             Contact
           </router-link>
 
-          <button 
-            @click="toggleDarkMode" 
+          <button
+            @click="toggleDarkMode"
             class="p-2 rounded-full transition text-white hover:text-orange-200"
             :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
           >
-            {{ isDark ? '☀️' : '🌙' }}
+            <SunIcon v-if="isDark" class="w-5 h-5" />
+            <MoonIcon v-else class="w-5 h-5" />
           </button>
 
           <button 
@@ -51,15 +52,16 @@
         </div>
 
         <div class="md:hidden flex items-center gap-4">
-          <button 
-            @click="toggleDarkMode" 
+          <button
+            @click="toggleDarkMode"
             class="p-2 text-white"
             :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
           >
-            {{ isDark ? '☀️' : '🌙' }}
+            <SunIcon v-if="isDark" class="w-5 h-5" />
+            <MoonIcon v-else class="w-5 h-5" />
           </button>
-          <button style="font-size: x-large;"@click="isMenuOpen = !isMenuOpen" class="focus:outline-none">
-            ☰
+          <button @click="isMenuOpen = !isMenuOpen" class="focus:outline-none text-white" aria-label="Toggle menu">
+            <Bars3Icon class="w-6 h-6" />
           </button>
         </div>
       </div>
@@ -112,6 +114,7 @@
 import router from '@/router'
 import { ref } from 'vue'
 import { useDarkMode } from '@/composables/useDarkMode'
+import { SunIcon, MoonIcon, Bars3Icon } from '@heroicons/vue/24/outline'
 
 const { isDark, toggleDarkMode } = useDarkMode()
 const isMenuOpen = ref(false)

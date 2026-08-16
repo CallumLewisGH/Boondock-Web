@@ -59,11 +59,11 @@
             borderColor: 'var(--border)'
           }"
         >
-          <div class="text-4xl mb-6 w-16 h-16 flex items-center justify-center rounded-full group-hover:scale-110 transition-transform shadow-sm"
-                :style="{ 
+          <div class="mb-6 w-16 h-16 flex items-center justify-center rounded-full group-hover:scale-110 transition-transform shadow-sm"
+                :style="{
                   backgroundColor: isDark ? 'var(--border)' : 'var(--surface)'
                 }">
-            {{ feature.icon }}
+            <component :is="feature.icon" class="w-8 h-8" :style="{ color: 'var(--accent)' }" />
           </div>
           <h3 class="text-xl font-bold mb-3"
               :style="{ color: 'var(--text-color)' }">
@@ -82,6 +82,8 @@
 <script setup lang="ts">
 
 import { useDarkMode } from '@/composables/useDarkMode'
+import { MapPinIcon, MapIcon } from '@heroicons/vue/24/outline'
+import { LeafIcon } from '@/components/icons'
 
 const { isDark } = useDarkMode()
 
@@ -89,17 +91,17 @@ const features = [
   {
     title: 'Hidden Gems',
     desc: 'Discover secluded wild camping spots verified by the community.',
-    icon: '📍'
+    icon: MapPinIcon
   },
   {
     title: 'Offline Maps',
     desc: 'Download topographical maps for when the signal fades.',
-    icon: '🗺️'
+    icon: MapIcon
   },
   {
     title: 'Leave No Trace',
     desc: 'Guides on sustainable camping to keep the wild, wild.',
-    icon: '🌿'
+    icon: LeafIcon
   }
 ]
 </script>

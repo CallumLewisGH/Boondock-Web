@@ -9,21 +9,21 @@
         <h2 class="text-xl font-bold pr-4" style="color: var(--text-color);">
           {{ campsite.name }}
         </h2>
-        <button @click="$emit('close')" class="opacity-50 hover:opacity-100 text-xl">✕</button>
+        <button @click="$emit('close')" class="opacity-50 hover:opacity-100" aria-label="Close"><XMarkIcon class="w-5 h-5" /></button>
       </div>
 
       <div class="px-6 grid grid-cols-2 gap-3 mb-6">
-        <div class="p-3 rounded-xl border border-dashed text-center" 
+        <div class="p-3 rounded-xl border border-dashed text-center"
              style="background-color: var(--surface); border-color: var(--border);">
           <div class="text-[10px] uppercase font-bold opacity-50 mb-1">Visits</div>
-          <div class="text-lg font-bold text-blue-500">📍 {{ campsite.visits?.length || 0 }}</div>
+          <div class="text-lg font-bold text-blue-500 flex items-center justify-center gap-1"><MapPinIcon class="w-4 h-4" /> {{ campsite.visits?.length || 0 }}</div>
         </div>
-        
-        <div v-if="campsite.boondockScore !== undefined" 
-             class="p-3 rounded-xl border border-dashed text-center" 
+
+        <div v-if="campsite.boondockScore !== undefined"
+             class="p-3 rounded-xl border border-dashed text-center"
              style="background-color: var(--surface); border-color: var(--border);">
           <div class="text-[10px] uppercase font-bold opacity-50 mb-1">Score</div>
-          <div class="text-lg font-bold text-orange-500">★ {{ campsite.boondockScore.toFixed(1) }}</div>
+          <div class="text-lg font-bold text-orange-500 flex items-center justify-center gap-1"><StarIcon class="w-4 h-4" /> {{ campsite.boondockScore.toFixed(1) }}</div>
         </div>
       </div>
 
@@ -53,6 +53,8 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import type { CampsiteProfile } from '@/api'
+import { XMarkIcon, MapPinIcon } from '@heroicons/vue/24/outline'
+import { StarIcon } from '@heroicons/vue/24/solid'
 
 const props = defineProps<{
   isOpen: boolean

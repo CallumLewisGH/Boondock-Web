@@ -55,11 +55,11 @@
               borderColor: 'var(--border)'
             }"
           >
-            <div class="text-4xl mb-6 w-16 h-16 flex items-center justify-center rounded-full group-hover:scale-110 transition-transform"
-                  :style="{ 
+            <div class="mb-6 w-16 h-16 flex items-center justify-center rounded-full group-hover:scale-110 transition-transform"
+                  :style="{
                     backgroundColor: isDark ? 'var(--border)' : 'var(--surface)'
                   }">
-              {{ principle.icon }}
+              <component :is="principle.icon" class="w-8 h-8" :style="{ color: 'var(--accent)' }" />
             </div>
             <h3 class="text-xl font-bold mb-3"
                 :style="{ color: 'var(--text-color)' }">
@@ -114,7 +114,7 @@
                     :style="{ 
                       backgroundColor: isDark ? 'var(--card-bg)' : 'var(--border)'
                     }">
-                <span class="text-6xl">🧭</span>
+                <CompassIcon class="w-20 h-20" :style="{ color: 'var(--accent)' }" />
               </div>
             </div>
           </div>
@@ -128,6 +128,8 @@
 <script setup lang="ts">
 
 import { useDarkMode } from '@/composables/useDarkMode'
+import { ClipboardDocumentListIcon, TrashIcon, BuildingLibraryIcon, FireIcon } from '@heroicons/vue/24/outline'
+import { FootprintsIcon, DeerIcon, CompassIcon } from '@/components/icons'
 
 const { isDark } = useDarkMode()
 
@@ -135,32 +137,32 @@ const principles = [
   {
     title: 'Plan Ahead',
     desc: 'Know the regulations and concerns for the area you\'ll visit. Prepare for extreme weather, hazards, and emergencies.',
-    icon: '📋'
+    icon: ClipboardDocumentListIcon
   },
   {
     title: 'Travel on Trail',
     desc: 'Stick to established trails and campsites. But don\'t let that stop you from exploring new areas responsibly!',
-    icon: '👣'
+    icon: FootprintsIcon
   },
   {
     title: 'Dispose of Waste Properly',
     desc: 'Pack it in, pack it out. Inspect your campsite and rest areas for trash or spilled foods. Pack out all trash.',
-    icon: '🗑️'
+    icon: TrashIcon
   },
   {
     title: 'Leave What You Find',
     desc: 'Preserve the past: examine, but do not touch cultural or historic structures and artifacts.',
-    icon: '🏛️'
+    icon: BuildingLibraryIcon
   },
   {
     title: 'Minimize Campfire Impacts',
     desc: 'Use a camp stove for cooking and enjoy a candle lantern for light. Where fires are permitted, use established fire rings.',
-    icon: '🔥'
+    icon: FireIcon
   },
   {
     title: 'Respect Wildlife',
     desc: 'Observe wildlife from a distance. Do not follow or approach them. Never feed animals.',
-    icon: '🦌'
+    icon: DeerIcon
   }
 ]
 </script>

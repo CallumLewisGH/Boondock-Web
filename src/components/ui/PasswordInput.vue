@@ -25,10 +25,12 @@
       <button
         @click="showPassword = !showPassword"
         type="button"
-        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-lg transition-opacity hover:opacity-70"
+        class="absolute right-3 top-1/2 transform -translate-y-1/2 transition-opacity hover:opacity-70"
+        :style="{ color: 'var(--muted)' }"
         :aria-label="showPassword ? 'Hide password' : 'Show password'"
       >
-        {{ showPassword ? '👁' : '👁‍🗨' }}
+        <EyeSlashIcon v-if="showPassword" class="w-5 h-5" />
+        <EyeIcon v-else class="w-5 h-5" />
       </button>
     </div>
     <p v-if="error" class="text-xs text-red-500 mt-1">{{ error }}</p>
@@ -38,6 +40,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
 
 defineProps<{
   modelValue: string

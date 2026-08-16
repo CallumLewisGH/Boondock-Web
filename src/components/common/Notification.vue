@@ -2,7 +2,7 @@
   <div v-if="isVisible" class="p-4 rounded-lg border" 
        :style="{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border)' }">
     <div class="flex items-start gap-3">
-      <span class="text-lg flex-shrink-0">{{ icon }}</span>
+      <component :is="icon" class="w-5 h-5 flex-shrink-0" :style="{ color: 'var(--muted)' }" />
       <div class="flex-1">
         <h3 v-if="title" class="font-semibold text-sm mb-1" :style="{ color: 'var(--text-color)' }">
           {{ title }}
@@ -21,17 +21,18 @@
         :style="{ color: 'var(--muted)' }"
         aria-label="Close notification"
       >
-        ✕
+        <XMarkIcon class="w-4 h-4" />
       </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, type Component } from 'vue'
+import { InformationCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 
 interface Props {
-  icon?: string
+  icon?: Component
   title?: string
   message?: string
   closable?: boolean
@@ -39,7 +40,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  icon: 'ℹ',
+  icon: () => InformationCircleIcon,
   closable: true,
   duration: 5000
 })

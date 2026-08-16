@@ -113,7 +113,7 @@
                     borderColor: 'var(--border)'
                   }">
               <div class="flex items-start gap-4">
-                <div class="text-3xl">📧</div>
+                <EnvelopeIcon class="w-8 h-8 flex-shrink-0" :style="{ color: 'var(--accent)' }" />
                 <div>
                   <h3 class="text-lg font-bold mb-1"
                       :style="{ color: 'var(--text-color)' }">
@@ -132,7 +132,7 @@
                     borderColor: 'var(--border)'
                   }">
               <div class="flex items-start gap-4">
-                <div class="text-3xl">📱</div>
+                <DevicePhoneMobileIcon class="w-8 h-8 flex-shrink-0" :style="{ color: 'var(--accent)' }" />
                 <div>
                   <h3 class="text-lg font-bold mb-1"
                       :style="{ color: 'var(--text-color)' }">
@@ -189,5 +189,5 @@
 </template>
 
 <script setup lang="ts">
-
+import { EnvelopeIcon, DevicePhoneMobileIcon } from '@heroicons/vue/24/outline'
 </script>

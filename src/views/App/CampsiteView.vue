@@ -16,8 +16,11 @@
                 ? 'bg-green-500/10 border-green-500 text-green-500' 
                 : 'bg-transparent border-dashed border-gray-400 hover:border-accent opacity-70 hover:opacity-100']"
           >
-            <span v-if="togglingVisit" class="animate-spin mr-1">⏳</span>
-            <span v-else>{{ hasUserVisited ? '✓ Visited' : '＋ I\'ve Been Here' }}</span>
+            <ArrowPathIcon v-if="togglingVisit" class="w-4 h-4 animate-spin" />
+            <span v-else class="flex items-center gap-1">
+              <CheckIcon v-if="hasUserVisited" class="w-4 h-4" /><PlusIcon v-else class="w-4 h-4" />
+              {{ hasUserVisited ? 'Visited' : "I've Been Here" }}
+            </span>
           </button>
           <span v-if="campsite.visits?.length" class="text-xs font-medium opacity-60">
             {{ campsite.visits?.length }} {{ campsite.visits?.length === 1 ? 'person has' : 'people have' }} explored this spot
@@ -28,11 +31,11 @@
       <div class="flex gap-4">
         <div class="text-center p-4 rounded-xl border" style="background-color: var(--surface); border-color: var(--border);">
           <div class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--muted);">Visits</div>
-          <div class="text-xl font-bold text-blue-500">📍 {{ campsite.visits?.length || 0 }}</div>
+          <div class="text-xl font-bold text-blue-500 flex items-center justify-center gap-1"><MapPinIcon class="w-5 h-5" /> {{ campsite.visits?.length || 0 }}</div>
         </div>
         <div v-if="campsite.boondockScore !== undefined" class="text-center p-4 rounded-xl border" style="background-color: var(--surface); border-color: var(--border);">
           <div class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--muted);">Score</div>
-          <div class="text-xl font-bold text-orange-500">★ {{ campsite.boondockScore.toFixed(1) }}</div>
+          <div class="text-xl font-bold text-orange-500 flex items-center justify-center gap-1"><StarIcon class="w-5 h-5" /> {{ campsite.boondockScore.toFixed(1) }}</div>
         </div>
         <div class="text-right p-4 rounded-xl border" style="background-color: var(--surface); border-color: var(--border);">
           <div class="text-xs font-bold uppercase tracking-wider mb-1" style="color: var(--muted);">Location</div>
@@ -112,7 +115,7 @@
             <p class="text-sm leading-relaxed">{{ review.description }}</p>
           </div>
         </div>
-        <EmptyState v-else icon="💬" title="No Reviews Yet" message="Be the first to share!" />
+        <EmptyState v-else :icon="ChatBubbleLeftEllipsisIcon" title="No Reviews Yet" message="Be the first to share!" />
       </div>
     </div>
   </div>
@@ -145,6 +148,8 @@ import FormCard from '@/components/common/FormCard.vue'
 import Button from '@/components/ui/Button.vue'
 import ConfirmDeleteModal from '@/components/ui/ConfirmDeleteModal.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
+import { ArrowPathIcon, CheckIcon, PlusIcon, MapPinIcon, ChatBubbleLeftEllipsisIcon } from '@heroicons/vue/24/outline'
+import { StarIcon } from '@heroicons/vue/24/solid'
 
 const route = useRoute()
 const router = useRouter()

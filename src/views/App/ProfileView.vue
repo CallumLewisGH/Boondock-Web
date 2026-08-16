@@ -6,7 +6,7 @@
         class="absolute -top-2 -right-2 p-2 rounded-full shadow-lg hover:opacity-90 transition-opacity z-10"
         style="background-color: var(--accent); color: var(--header-text);"
       >
-        ✏️
+        <PencilSquareIcon class="w-5 h-5" />
       </button>
       <input 
         type="file" 
@@ -53,8 +53,8 @@
             @click="selectCampsite(camp)"
           >
             <template #icon>
-              <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" :style="{ backgroundColor: 'var(--surface)' }">
-                ⛺
+              <div class="w-12 h-12 rounded-lg flex items-center justify-center" :style="{ backgroundColor: 'var(--surface)', color: 'var(--accent)' }">
+                <TentIcon class="w-6 h-6" />
               </div>
             </template>
             <template #title>{{ camp.name }}</template>
@@ -64,9 +64,9 @@
             </template>
           </Card>
         </div>
-        <EmptyState 
+        <EmptyState
           v-else
-          icon="⛺"
+          :icon="TentIcon"
           title="No Spots Found"
           message="You haven't posted any campsites yet."
         />
@@ -80,8 +80,8 @@
             @click="selectCampsite(camp)"
           >
             <template #icon>
-              <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" :style="{ backgroundColor: 'var(--surface)' }">
-                📍
+              <div class="w-12 h-12 rounded-lg flex items-center justify-center" :style="{ backgroundColor: 'var(--surface)', color: 'var(--accent)' }">
+                <MapPinIcon class="w-6 h-6" />
               </div>
             </template>
             <template #title>{{ camp.name }}</template>
@@ -91,9 +91,9 @@
             </template>
           </Card>
         </div>
-        <EmptyState 
+        <EmptyState
           v-else
-          icon="📍"
+          :icon="MapPinIcon"
           title="No Visited Spots"
           message="Campsites you mark as visited will appear here!"
         />
@@ -120,9 +120,9 @@
             </template>
           </Card>
         </div>
-        <EmptyState 
+        <EmptyState
           v-else
-          icon="💬"
+          :icon="ChatBubbleLeftEllipsisIcon"
           title="No Reviews Yet"
           message="Share your experience by reviewing a campsite!"
         />
@@ -225,6 +225,8 @@ import Card from '@/components/common/Card.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import TextInput from '@/components/ui/TextInput.vue'
 import CountedTextArea from '@/components/common/CountedTextArea.vue'
+import { PencilSquareIcon, MapPinIcon, ChatBubbleLeftEllipsisIcon } from '@heroicons/vue/24/outline'
+import { TentIcon } from '@/components/icons'
 import { CampsitesService } from '@/services/CampsitesService'
 import { CampsiteReviewsService } from '@/services/CampsiteReviewsService'
 import { UsersService } from '@/services/UsersService'

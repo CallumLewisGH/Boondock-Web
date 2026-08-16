@@ -11,20 +11,21 @@
     </div>
 
     <!-- Simple back button to home -->
-    <router-link to="/" 
-                 class="absolute top-8 left-8 p-2 rounded-full transition text-white hover:text-orange-200"
+    <router-link to="/"
+                 class="absolute top-8 left-8 p-2 rounded-full transition text-white hover:text-orange-200 flex items-center gap-1"
                  :style="{ backgroundColor: isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.1)' }">
-      ← Back
+      <ArrowLeftIcon class="w-4 h-4" /> Back
     </router-link>
 
     <!-- Dark mode toggle -->
-    <button 
-      @click="toggleDarkMode" 
+    <button
+      @click="toggleDarkMode"
       class="absolute top-8 right-8 p-2 rounded-full transition text-white hover:text-orange-200"
       :style="{ backgroundColor: isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.1)' }"
       :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
     >
-      {{ isDark ? '☀️' : '🌙' }}
+      <SunIcon v-if="isDark" class="w-5 h-5" />
+      <MoonIcon v-else class="w-5 h-5" />
     </button>
 
     <!-- Main login box -->
@@ -96,6 +97,7 @@
 import { ref, onMounted } from 'vue';
 import router from '@/router';
 import { useUserStore } from '@/stores/userStore';
+import { ArrowLeftIcon, SunIcon, MoonIcon } from '@heroicons/vue/24/outline';
 
 const userStore = useUserStore();
 

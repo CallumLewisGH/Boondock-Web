@@ -8,16 +8,18 @@
 
     <div class="absolute top-6 right-6 flex flex-col gap-3 z-10">      
       <button @click="toggleLayer" class="control-btn" :title="showSatellite ? 'Topographical' : 'Satellite'">
-        <span>{{ showSatellite ? '🌲' : '🛰️' }}</span>
+        <PineTreeIcon v-if="showSatellite" class="w-5 h-5" />
+        <GlobeAltIcon v-else class="w-5 h-5" />
       </button>
       <button @click="locateUser" class="control-btn" title="Find my location">
-        <span>🎯</span>
+        <ViewfinderCircleIcon class="w-5 h-5" />
       </button>
       <button @click="resetNorth" class="control-btn" title="Reset North">
-        <span :style="{ transform: `rotate(${mapBearing}deg)`, display: 'inline-block' }">🧭</span>
+        <CompassIcon class="w-5 h-5" :style="{ transform: `rotate(${mapBearing}deg)`, display: 'inline-block' }" />
       </button>
       <button @click="toggleCreationMode" class="control-btn" :class="{ 'active-mode': isCreationMode }">
-        <span>{{ isCreationMode ? '✕' : '⛺' }}</span>
+        <XMarkIcon v-if="isCreationMode" class="w-5 h-5" />
+        <TentIcon v-else class="w-5 h-5" />
       </button>
     </div>
 
@@ -60,6 +62,12 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import CampsiteSidebar from './CampsiteSidebar.vue'
 import { CampsitesService } from '@/services/CampsitesService'
 import type { CampsiteProfile } from '@/api'
+import { TentIcon, CompassIcon, PineTreeIcon } from '@/components/icons'
+import { GlobeAltIcon, ViewfinderCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+
+// Mapbox markers are plain DOM nodes outside Vue's render tree, so the tent
+// icon is inlined as raw SVG here rather than mounting a Vue component.
+const TENT_MARKER_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 21 19H3Z"/><path d="M12 4v15"/><path d="M9.5 19 12 13.5 14.5 19"/><path d="M2 19h20"/></svg>'
 
 const props = defineProps<{ accessToken: string }>()
 const mapContainer = ref<HTMLElement>()
@@ -111,7 +119,7 @@ const refreshCampsites = async () => {
   result.data.forEach((camp) => {
     const el = document.createElement('div')
     el.className = 'marker-wrapper'
-    el.innerHTML = `<div class="campsite-marker">⛺</div>`
+    el.innerHTML = `<div class="campsite-marker">${TENT_MARKER_SVG}</div>`
     
     const marker = new mapboxgl.Marker({ element: el })
       .setLngLat([camp.longitude, camp.latitude])
@@ -133,7 +141,7 @@ const handleMapClick = (lng: number, lat: number) => {
   
   const el = document.createElement('div')
   el.className = 'custom-tent-marker active-pin'
-  el.innerHTML = '⛺'
+  el.innerHTML = TENT_MARKER_SVG
 
   tempMarker.value = new mapboxgl.Marker({ element: el, draggable: true })
     .setLngLat([lng, lat])
@@ -195,10 +203,25 @@ onUnmounted(() => map.value?.remove())
 <style scoped>
 /* Re-use your existing styles here */
 .map-container { position: absolute; inset: 0; }
-.control-btn { width: 44px; height: 44px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; }
+.control-btn { width: 44px; height: 44px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-color); cursor: pointer; }
 .active-mode { background: var(--accent); color: white; }
-:deep(.campsite-marker) { font-size: 1.5rem; transition: transform 0.2s; cursor: pointer; }
+:deep(.campsite-marker) {
+  width: 34px; height: 34px; padding: 7px; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--card-bg); color: var(--accent);
+  border: 2px solid var(--accent); border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s; cursor: pointer;
+}
+:deep(.campsite-marker svg) { width: 100%; height: 100%; }
 :deep(.marker-wrapper:hover .campsite-marker) { transform: scale(1.3) translateY(-5px); }
+:deep(.custom-tent-marker) {
+  width: 38px; height: 38px; padding: 8px; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent); color: white; border-radius: 50%;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+}
+:deep(.custom-tent-marker svg) { width: 100%; height: 100%; }
 .creation-overlay { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 380px; z-index: 20; }
 .creation-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 .input-group input, .input-group textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text-color); padding: 10px; border-radius: 8px; }

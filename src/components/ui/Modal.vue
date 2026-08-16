@@ -31,7 +31,7 @@
               :style="{ color: 'var(--muted)' }"
               aria-label="Close modal"
             >
-              ✕
+              <XMarkIcon class="w-5 h-5" />
             </button>
           </div>
 
@@ -52,6 +52,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { XMarkIcon } from '@heroicons/vue/24/outline'
 
 interface Props {
   isOpen: boolean

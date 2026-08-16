@@ -58,7 +58,7 @@
                   color: 'var(--text-color)'
                 }"
               >
-                <div class="flex-shrink-0 text-xl">⛺</div>
+                <TentIcon class="flex-shrink-0 w-5 h-5" />
                 <div class="flex-1 min-w-0">
                   <div class="font-medium truncate">{{ camp.name }}</div>
                   <div class="text-xs line-clamp-1 opacity-70">{{ camp.description || 'No description' }}</div>
@@ -80,16 +80,25 @@
       
       <!-- Right Actions -->
       <div class="flex items-center gap-2 flex-shrink-0">
-        <Button 
-          :label="isDark ? '☀️' : '🌙'"
+        <Button
+          :label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
           variant="outline"
           @click="toggleDarkMode"
-        />
-        <Button 
-          label="👤"
+        >
+          <template #icon>
+            <SunIcon v-if="isDark" class="w-4 h-4" />
+            <MoonIcon v-else class="w-4 h-4" />
+          </template>
+        </Button>
+        <Button
+          label="Profile"
           variant="outline"
           @click="toggleProfile"
-        />
+        >
+          <template #icon>
+            <UserIcon class="w-4 h-4" />
+          </template>
+        </Button>
       </div>
     </div>
   </div>
@@ -107,6 +116,8 @@ import { formatBase64 } from '@/helpers/base64'
 import TextInput from '@/components/ui/TextInput.vue'
 import Button from '@/components/ui/Button.vue'
 import UserAvatar from '@/components/common/UserAvatar.vue'
+import { TentIcon } from '@/components/icons'
+import { SunIcon, MoonIcon, UserIcon } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const { isDark, toggleDarkMode } = useDarkMode()
